@@ -3,7 +3,7 @@
     <button class="home-btn" @click="goHome">🏠 返回首页</button>
     
     <div class="header">
-      <h1>♾️ 无尽挑战模式</h1>
+      <h1>♾️ 无尽挑战模式 <span v-if="hasApiKey" class="ai-badge">🤖 AI 生成</span></h1>
       <div class="stats">
         <div class="stat">
           <span class="stat-icon">⭐</span>
@@ -11,11 +11,11 @@
         </div>
         <div class="stat">
           <span class="stat-icon">💪</span>
-          <span>难度: <span>{{ gameStore.currentDifficulty }}</span></span>
+          <span>难度: <span>{{ gameStore.currentDifficulty }}</span>/6</span>
         </div>
         <div class="stat">
           <span class="stat-icon">❤️</span>
-          <span>生命: <span>{{ gameStore.lives }}</span></span>
+          <span>生命: <span>{{ '❤️'.repeat(gameStore.lives) }}{{ '🖤'.repeat(Math.max(0, 3 - gameStore.lives)) }}</span></span>
         </div>
         <div class="stat">
           <span class="stat-icon">🔥</span>
@@ -23,24 +23,27 @@
         </div>
         <div class="stat">
           <span class="stat-icon">📝</span>
-          <span>题目: <span>{{ gameStore.endlessQuestionCount }}</span></span>
+          <span>已答: <span>{{ gameStore.endlessQuestionCount }}</span> 题</span>
         </div>
       </div>
     </div>
 
     <div class="game-screen" v-if="!isGameOver">
-      <div v-if="isLoading" class="loading-indicator">
+      <div v-if="isLoading" class="loading-area">
         <div class="spinner"></div>
-        <span>正在生成题目...</span>
+        <p>{{ loadingText }}</p>
+        <p class="loading-sub">题目绝不重复，难度随连击递增喵~</p>
       </div>
 
       <template v-else-if="currentQuestion">
         <div class="level-info">
-          <span class="level-badge">无尽挑战 - 难度 {{ gameStore.currentDifficulty }}</span>
+          <span class="level-badge">无尽挑战 · 难度 {{ gameStore.currentDifficulty }}/6</span>
+          <span v-if="currentQuestion.fromAI" class="ai-tag">🤖 AI 生成</span>
+          <span v-else class="local-tag">📚 题库</span>
         </div>
 
         <div class="question-box">
-          <div class="question-number">问题 {{ gameStore.endlessQuestionCount + 1 }}</div>
+          <div class="question-number">第 {{ gameStore.endlessQuestionCount + 1 }} 题</div>
           <div class="question-text">{{ currentQuestion.question }}</div>
         </div>
 
@@ -48,45 +51,56 @@
           <div 
             v-for="(option, index) in currentQuestion.options" 
             :key="index"
-            :class="['option', selectedOption === index ? (isCorrect ? 'correct' : 'wrong') : '']"
+            :class="optionClass(index)"
             :style="{ pointerEvents: selectedOption !== null ? 'none' : 'auto' }"
             @click="selectOption(index)"
           >
             <span class="option-label">{{ String.fromCharCode(65 + index) }}.</span>
             <span>{{ option }}</span>
+            <span v-if="selectedOption === index && isCorrect" class="option-check">✅</span>
+            <span v-if="selectedOption === index && !isCorrect" class="option-check">❌</span>
           </div>
         </div>
 
-        <div :class="['feedback', selectedOption !== null ? (isCorrect ? 'correct' : 'wrong') : '']">
-          {{ feedbackText }}
-        </div>
+        <transition name="fade">
+          <div v-if="selectedOption !== null" :class="['feedback', isCorrect ? 'feedback-correct' : 'feedback-wrong']">
+            {{ feedbackText }}
+          </div>
+        </transition>
 
-        <div class="explanation" :class="{ show: selectedOption !== null }">
-          <strong>解析：</strong>{{ currentQuestion.explanation }}
-        </div>
+        <transition name="slide">
+          <div v-if="selectedOption !== null" class="explanation-box">
+            <strong>💡 解析：</strong>{{ currentQuestion.explanation }}
+          </div>
+        </transition>
 
-        <button class="btn" :class="{ show: selectedOption !== null }" @click="nextQuestion">
-          下一题
-        </button>
+        <transition name="fade">
+          <button v-if="selectedOption !== null" class="next-btn" @click="nextQuestion">
+            下一题 ➤
+          </button>
+        </transition>
       </template>
     </div>
 
     <div class="game-over" v-else>
-      <h2>💔 游戏结束</h2>
+      <h2>{{ gameStore.lives <= 0 ? '💔 挑战结束' : '🎉 精彩！' }}</h2>
       <div class="final-stats">
-        <div class="final-stat">最终得分: {{ gameStore.score }}</div>
-        <div class="final-stat">答对题目: {{ gameStore.totalCorrect }}</div>
-        <div class="final-stat">最高连击: {{ gameStore.maxCombo }}</div>
-        <div class="final-stat">答题数量: {{ gameStore.endlessQuestionCount }}</div>
+        <div class="final-stat">🌟 最终得分: <strong>{{ gameStore.score }}</strong></div>
+        <div class="final-stat">✅ 答对题目: <strong>{{ gameStore.totalCorrect }}</strong></div>
+        <div class="final-stat">🔥 最高连击: <strong>{{ gameStore.maxCombo }}</strong></div>
+        <div class="final-stat">📝 答题数量: <strong>{{ gameStore.endlessQuestionCount }}</strong></div>
+        <div class="final-stat">💪 最终难度: <strong>{{ gameStore.currentDifficulty }}/6</strong></div>
       </div>
-      <button class="btn" @click="restart">再来一局</button>
-      <button class="btn btn-secondary" @click="goHome">返回首页</button>
+      <div class="game-over-buttons">
+        <button class="btn" @click="restart">🔁 再来一局</button>
+        <button class="btn btn-secondary" @click="goHome">🏠 返回首页</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
 
@@ -97,107 +111,130 @@ const selectedOption = ref(null)
 const isCorrect = ref(false)
 const feedbackText = ref('')
 const isLoading = ref(false)
+const loadingText = ref('正在生成题目...')
 const isGameOver = ref(false)
 const currentQuestion = ref(null)
+const usedQuestionHashes = ref([])
+const consecutiveCorrect = ref(0)
 
-const fallbackQuestions = [
-  {
-    question: 'Java中，以下哪个类是所有字节输入流的抽象基类？',
-    options: ['OutputStream', 'InputStream', 'Reader', 'Writer'],
-    correct: 1,
-    explanation: 'InputStream 是所有字节输入流的抽象基类，OutputStream 是字节输出流基类，Reader/Writer 是字符流基类。'
-  },
-  {
-    question: 'BufferedReader的readLine()方法返回什么？',
-    options: ['字节', '字符', '字符串', '整数'],
-    correct: 2,
-    explanation: 'readLine()方法读取一行文本并返回字符串，到达文件末尾时返回null。'
-  },
-  {
-    question: 'Java NIO中，flip()方法的作用是什么？',
-    options: ['翻转缓冲区', '切换到读模式', '清空缓冲区', '写入数据'],
-    correct: 1,
-    explanation: 'flip()方法将缓冲区从写模式切换到读模式，设置limit=position，position=0。'
-  },
-  {
-    question: 'try-with-resources语句的优势是什么？',
-    options: ['代码更短', '自动关闭资源', '运行更快', '占用内存更少'],
-    correct: 1,
-    explanation: 'try-with-resources会自动关闭实现AutoCloseable接口的资源，即使发生异常也能正确关闭。'
-  },
-  {
-    question: '以下哪个类用于对象序列化？',
-    options: ['FileOutputStream', 'ObjectOutputStream', 'DataOutputStream', 'BufferedOutputStream'],
-    correct: 1,
-    explanation: 'ObjectOutputStream用于将Java对象序列化并写入输出流。'
-  }
-]
+const hasApiKey = computed(() => {
+  const key = localStorage.getItem('deepseek_api_key')
+  return !!(key && key.trim())
+})
 
 onMounted(() => {
+  gameStore.startEndlessMode()
   loadNextQuestion()
 })
 
 async function loadNextQuestion() {
   isLoading.value = true
   selectedOption.value = null
-  
+  feedbackText.value = ''
+
+  const texts = ['🧠 AI 正在出题...', '📝 构思题目中...', '🔍 确保题目不重复...', '✨ 即将生成新题...']
+  loadingText.value = texts[Math.floor(Math.random() * texts.length)]
+
   try {
-    // 尝试从后端获取题目
-    const response = await fetch('/api/questions/random', {
+    const apiKey = localStorage.getItem('deepseek_api_key') || ''
+
+    const res = await fetch('/api/ai/generate-question', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ difficulty: gameStore.currentDifficulty })
+      body: JSON.stringify({
+        apiKey,
+        difficulty: gameStore.currentDifficulty,
+        usedQuestionHashes: usedQuestionHashes.value
+      })
     })
-    
-    if (response.ok) {
-      currentQuestion.value = await response.json()
+
+    if (res.ok) {
+      const question = await res.json()
+      if (question.question && question.options) {
+        const hash = simpleHash(question.question)
+        if (!usedQuestionHashes.value.includes(hash)) {
+          usedQuestionHashes.value.push(hash)
+        }
+        currentQuestion.value = question
+      } else {
+        throw new Error('题目格式错误')
+      }
     } else {
-      // 使用本地备用题目
-      currentQuestion.value = getRandomFallbackQuestion()
+      throw new Error('接口返回错误')
     }
-  } catch (error) {
-    // 使用本地备用题目
-    currentQuestion.value = getRandomFallbackQuestion()
+  } catch (err) {
+    console.error('获取题目失败:', err)
+    currentQuestion.value = {
+      question: 'Java中，InputStream 的 read() 方法返回 -1 表示什么？',
+      options: ['读取错误', '文件结束（EOF）', '读取超时', '缓冲区为空'],
+      correct: 1,
+      explanation: 'read() 方法返回 -1 表示已到达输入流的末尾（EOF，End of File）。这是一个经典的 Java I/O 面试题喵~',
+      fromAI: false
+    }
+    const hash = simpleHash(currentQuestion.value.question)
+    if (!usedQuestionHashes.value.includes(hash)) {
+      usedQuestionHashes.value.push(hash)
+    }
   } finally {
     isLoading.value = false
   }
 }
 
-function getRandomFallbackQuestion() {
-  const index = Math.floor(Math.random() * fallbackQuestions.length)
-  return fallbackQuestions[index]
+function simpleHash(str) {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i)
+    hash |= 0
+  }
+  return 'q' + Math.abs(hash).toString(36)
+}
+
+function optionClass(index) {
+  if (selectedOption.value === null) return 'option'
+  if (index === currentQuestion.value.correct) return 'option option-correct'
+  if (index === selectedOption.value) return 'option option-wrong'
+  return 'option option-dimmed'
 }
 
 function selectOption(index) {
   if (selectedOption.value !== null) return
-  
+
   selectedOption.value = index
-  isCorrect.value = index === currentQuestion.value.correct
-  
-  gameStore.answerQuestion(isCorrect.value)
-  
-  if (isCorrect.value) {
-    feedbackText.value = '🎉 回答正确！'
+  const correct = index === currentQuestion.value.correct
+  isCorrect.value = correct
+
+  if (correct) {
+    consecutiveCorrect.value++
+    feedbackText.value = '🎉 回答正确！太棒了喵~'
   } else {
+    consecutiveCorrect.value = 0
     feedbackText.value = `❌ 回答错误！正确答案是 ${String.fromCharCode(65 + currentQuestion.value.correct)}`
   }
-  
+
+  gameStore.answerQuestion(correct)
+
+  const newDifficulty = Math.floor(consecutiveCorrect.value / 3) + 1
+  gameStore.currentDifficulty = Math.min(newDifficulty, 6)
+
   if (gameStore.lives <= 0) {
     setTimeout(() => {
       isGameOver.value = true
-    }, 1000)
+    }, 1200)
   }
 }
 
 function nextQuestion() {
   gameStore.nextQuestion()
   loadNextQuestion()
-  feedbackText.value = ''
 }
 
 function restart() {
   gameStore.startEndlessMode()
+  usedQuestionHashes.value = []
+  consecutiveCorrect.value = 0
   isGameOver.value = false
+  selectedOption.value = null
+  feedbackText.value = ''
   loadNextQuestion()
 }
 
@@ -215,6 +252,7 @@ function goHome() {
   width: 100%;
   overflow: hidden;
   position: relative;
+  margin: 20px auto;
 }
 
 .home-btn {
@@ -250,6 +288,14 @@ function goHome() {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
 
+.ai-badge {
+  background: rgba(255,255,255,0.2);
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: 0.5em;
+  vertical-align: middle;
+}
+
 .stats {
   display: flex;
   justify-content: center;
@@ -264,58 +310,89 @@ function goHome() {
   gap: 8px;
 }
 
-.stat-icon {
-  font-size: 1.2em;
-}
+.stat-icon { font-size: 1.2em; }
 
 .game-screen {
   padding: 30px;
 }
 
-.loading-indicator {
+.loading-area {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 50px;
+  padding: 60px 30px;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #cce0ff;
-  border-top-color: #0066cc;
+  width: 44px;
+  height: 44px;
+  border: 4px solid #ffe0cc;
+  border-top-color: #ff6600;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 20px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-area p {
+  color: #ff6600;
+  font-size: 1.15em;
+  font-weight: bold;
 }
 
-.loading-indicator span {
-  color: #0066cc;
-  font-size: 1.1em;
-  margin-top: 15px;
+.loading-sub {
+  font-size: 0.9em !important;
+  color: #999 !important;
+  font-weight: normal !important;
+  margin-top: 8px;
 }
 
 .level-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .level-badge {
   background: linear-gradient(135deg, #ff6600 0%, #cc5200 100%);
   color: white;
-  padding: 8px 20px;
-  border-radius: 20px;
+  padding: 7px 18px;
+  border-radius: 18px;
   font-size: 0.9em;
 }
 
+.ai-tag {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: #fff;
+  padding: 5px 14px;
+  border-radius: 14px;
+  font-size: 0.82em;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.local-tag {
+  background: #e6f0ff;
+  color: #0066cc;
+  padding: 5px 14px;
+  border-radius: 14px;
+  font-size: 0.82em;
+}
+
 .question-box {
-  background: #f8fafc;
+  background: #fffaf5;
   padding: 25px;
   border-radius: 15px;
   margin-bottom: 25px;
+  border-left: 4px solid #ff6600;
 }
 
 .question-number {
@@ -326,7 +403,7 @@ function goHome() {
 }
 
 .question-text {
-  font-size: 1.2em;
+  font-size: 1.25em;
   color: #333;
   line-height: 1.6;
 }
@@ -334,34 +411,33 @@ function goHome() {
 .options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .option {
   display: flex;
-  align-items: flex-start;
-  padding: 15px 20px;
+  align-items: center;
+  padding: 14px 18px;
   background: white;
-  border: 2px solid #cce0ff;
+  border: 2px solid #e0e6f0;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
-.option:hover {
-  border-color: #ff6600;
-  background: #fff8f0;
+.option:hover { border-color: #ff6600; background: #fff8f0; }
+
+.option-correct {
+  border-color: #00cc66 !important;
+  background: #e6fff0 !important;
 }
 
-.option.correct {
-  border-color: #00cc66;
-  background: #e6fff0;
+.option-wrong {
+  border-color: #ff4444 !important;
+  background: #ffeaea !important;
 }
 
-.option.wrong {
-  border-color: #ff6666;
-  background: #ffebee;
-}
+.option-dimmed { opacity: 0.5; }
 
 .option-label {
   font-weight: bold;
@@ -370,75 +446,61 @@ function goHome() {
   min-width: 25px;
 }
 
+.option-check { margin-left: auto; font-size: 1.1em; }
+
 .feedback {
   text-align: center;
   padding: 15px;
   margin: 20px 0;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 1.2em;
   font-weight: bold;
-  opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
-.feedback.correct {
-  background: #e6fff0;
-  color: #00cc66;
-  opacity: 1;
-}
+.feedback-correct { background: #e6fff0; color: #00aa55; }
+.feedback-wrong { background: #ffeaea; color: #e33; }
 
-.feedback.wrong {
-  background: #ffebee;
-  color: #ff6666;
-  opacity: 1;
-}
-
-.explanation {
+.explanation-box {
   background: #f0f6ff;
-  padding: 20px;
-  border-radius: 10px;
+  padding: 18px;
+  border-radius: 12px;
   color: #333;
   line-height: 1.6;
-  display: none;
+  border-left: 3px solid #0066cc;
+  margin-bottom: 20px;
 }
 
-.explanation.show {
+.next-btn {
   display: block;
-}
-
-.btn {
-  display: none;
+  width: 100%;
   background: linear-gradient(135deg, #ff6600 0%, #cc5200 100%);
   color: white;
   border: none;
   padding: 15px 40px;
   border-radius: 25px;
-  font-size: 1.1em;
+  font-size: 1.15em;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin: 20px auto;
 }
 
-.btn.show {
-  display: block;
-}
-
-.btn:hover {
+.next-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(255, 102, 0, 0.4);
+  box-shadow: 0 6px 25px rgba(255, 102, 0, 0.4);
 }
 
-.btn-secondary {
-  background: linear-gradient(135deg, #4a90d9 0%, #3a7bc8 100%);
-}
+.fade-enter-active { transition: opacity 0.4s ease; }
+.fade-enter-from { opacity: 0; }
+
+.slide-enter-active { transition: all 0.4s ease; }
+.slide-enter-from { opacity: 0; transform: translateY(10px); }
 
 .game-over {
   text-align: center;
-  padding: 60px;
+  padding: 50px;
 }
 
 .game-over h2 {
-  font-size: 2.5em;
+  font-size: 2.2em;
   color: #ff6600;
   margin-bottom: 20px;
 }
@@ -448,8 +510,39 @@ function goHome() {
 }
 
 .final-stat {
-  font-size: 1.2em;
+  font-size: 1.15em;
   color: #333;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+}
+
+.final-stat strong {
+  color: #ff6600;
+}
+
+.game-over-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  background: linear-gradient(135deg, #ff6600 0%, #cc5200 100%);
+  color: white;
+  border: none;
+  padding: 13px 35px;
+  border-radius: 25px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 102, 0, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #4a90d9 0%, #3a7bc8 100%);
 }
 </style>

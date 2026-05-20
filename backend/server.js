@@ -364,12 +364,153 @@ try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("person.s
 💡 **提示：** 设置 DeepSeek API 密钥后，我可以调用 AI 大模型提供更智能的回答！只需免费注册 DeepSeek 获取密钥即可喵~`
 }
 
+const questionPool = {}
+const localQuestionBank = [
+  { level: 1, question: 'Java中哪个类是所有字节输入流的抽象基类？', options: ['OutputStream', 'InputStream', 'Reader', 'Writer'], correct: 1, explanation: 'InputStream 是所有字节输入流的抽象基类。' },
+  { level: 1, question: 'FileInputStream 主要用于什么场景？', options: ['读取文本文件', '读取二进制文件', '写入文件', '网络通信'], correct: 1, explanation: 'FileInputStream 以字节流方式读取任意文件，尤其适合二进制文件（图片、视频等）。' },
+  { level: 1, question: 'InputStream.read() 方法一次读取多少数据？', options: ['一个字符', '一个字节', '一行', '所有数据'], correct: 1, explanation: 'read() 方法每次读取一个字节（0-255），返回 -1 表示文件结束。' },
+  { level: 1, question: 'OutputStream 的 write(int b) 参数类型是？', options: ['byte', 'int', 'char', 'short'], correct: 1, explanation: 'write(int b) 虽然接受 int 参数，但只写入低 8 位（一个字节）。' },
+  { level: 2, question: 'FileReader 和 FileInputStream 的主要区别是什么？', options: ['没有区别', 'FileReader 按字符读取，FileInputStream 按字节读取', 'FileReader 更快', 'FileInputStream 只能读文本'], correct: 1, explanation: 'FileReader 是字符流，按字符（16位Unicode）读取；FileInputStream 是字节流。' },
+  { level: 2, question: 'InputStreamReader 的核心作用是什么？', options: ['加速读取', '将字节流转换为字符流', '将字符流转换为字节流', '缓冲数据'], correct: 1, explanation: 'InputStreamReader 是字节流到字符流的桥梁，可将字节解码为字符。' },
+  { level: 2, question: 'BufferedReader 的 readLine() 读到末尾返回什么？', options: ['-1', 'null', '空字符串', '抛出异常'], correct: 1, explanation: 'readLine() 读取一行返回 String，到达末尾时返回 null。' },
+  { level: 2, question: 'Writer 和 OutputStream 的关系是？', options: ['Writer 继承 OutputStream', 'Writer 是字符输出流的基类', '两者完全相同', 'OutputStream 是字符流'], correct: 1, explanation: 'Writer 是所有字符输出流的抽象基类，OutputStream 是字节输出流的基类。' },
+  { level: 3, question: 'BufferedInputStream 默认缓冲区大小为？', options: ['1024字节', '4096字节', '8192字节', '16384字节'], correct: 2, explanation: 'BufferedInputStream 默认缓冲区为 8192 字节（8KB）。' },
+  { level: 3, question: 'BufferedWriter 的 flush() 方法作用是什么？', options: ['关闭流', '清空文件内容', '强制将缓冲区数据写入目标', '删除缓冲区'], correct: 2, explanation: 'flush() 将缓冲区中的数据强制刷新到底层输出流。' },
+  { level: 3, question: '以下关于缓冲流的描述哪个是错误的？', options: ['缓冲流能减少实际 I/O 操作', '缓冲流默认缓冲区 8KB', '缓冲流只能用于文件操作', '缓冲流包装在基础流之上'], correct: 2, explanation: '缓冲流不仅用于文件，也适用于网络流等任何 I/O 操作。' },
+  { level: 3, question: '使用缓冲流后，数据写入目标文件的时机是？', options: ['立即写入', '缓冲区满或调用 flush()/close() 时', '每 1 秒写入一次', '程序结束时写入'], correct: 1, explanation: '数据先写入缓冲区，缓冲区满或手动 flush()/close() 时才实际写入。' },
+  { level: 4, question: 'Java 序列化需要实现哪个接口？', options: ['Cloneable', 'Serializable', 'Closeable', 'Comparable'], correct: 1, explanation: '要实现 Java 对象序列化，类必须实现 java.io.Serializable 接口。' },
+  { level: 4, question: 'transient 关键字的作用是？', options: ['加速序列化', '标记字段不参与序列化', '标记字段必须序列化', '改变序列化顺序'], correct: 1, explanation: 'transient 修饰的字段在序列化时会被忽略，不会被写入输出流。' },
+  { level: 4, question: 'try-with-resources 要求资源必须实现什么接口？', options: ['Closeable', 'AutoCloseable', 'Serializable', 'Flushable'], correct: 1, explanation: 'try-with-resources 要求资源实现 AutoCloseable 接口（Java 7 引入）。' },
+  { level: 4, question: 'serialVersionUID 的作用是什么？', options: ['标识序列化版本', '控制序列化顺序', '决定文件大小', '加密序列化数据'], correct: 0, explanation: 'serialVersionUID 用于验证序列化对象的版本兼容性，不匹配会抛出 InvalidClassException。' },
+  { level: 5, question: 'Java NIO 中 Channel 与 Stream 的根本区别是？', options: ['Channel 更快', 'Channel 是双向的，Stream 是单向的', 'Channel 只能读', 'Channel 只能写'], correct: 1, explanation: 'Channel 支持双向读写，而传统的 Stream 是单向的（InputStream 只读，OutputStream 只写）。' },
+  { level: 5, question: 'Buffer.flip() 方法执行后会发生什么？', options: ['清空缓冲区', 'limit=position，position=0', 'position=limit，limit=0', '重置所有数据'], correct: 1, explanation: 'flip() 将 limit 设为 position，position 归零，从写模式切换到读模式。' },
+  { level: 5, question: 'Selector 在 NIO 中的作用是？', options: ['选择文件', '单线程管理多个 Channel', '选择缓冲区', '选择编码方式'], correct: 1, explanation: 'Selector 是多路复用器，允许单线程同时监控多个 Channel 的 I/O 事件。' },
+  { level: 5, question: 'Buffer.remaining() 返回什么？', options: ['总容量', '已写入的元素数', '可读/可写的剩余元素数', '缓冲区位置'], correct: 2, explanation: 'remaining() 返回 limit - position 的值，即可读（或可写）的剩余元素数量。' },
+  { level: 6, question: 'Java NIO 的 FileChannel 相比传统 FileInputStream 的优势？', options: ['更简单', '支持内存映射和文件锁定', '只能顺序读取', '不需要关闭'], correct: 1, explanation: 'FileChannel 支持内存映射（MappedByteBuffer）、文件区域锁定、随机位置读写等高级特性。' },
+  { level: 6, question: 'RandomAccessFile 的 "rw" 模式表示什么？', options: ['只读', '只写', '读写', '读写追加'], correct: 2, explanation: '"rw" 模式表示以可读写方式打开文件，文件不存在时会自动创建。' },
+  { level: 6, question: '以下哪个场景最不适合用字节流处理？', options: ['复制图片文件', '读取纯中文文本并逐行显示', '下载网络文件', '序列化对象'], correct: 1, explanation: '读取中文文本应使用字符流（如 BufferedReader/FileReader），字节流按字节读取可能破坏多字节字符。' },
+  { level: 6, question: 'PrintWriter 与 BufferedWriter 的主要区别？', options: ['没有区别', 'PrintWriter 提供格式化输出方法（print/println）', 'BufferedWriter 更快', 'PrintWriter 只能写字节'], correct: 1, explanation: 'PrintWriter 提供 print()/println()/printf() 等便捷方法，且默认自动刷新。' },
+  { level: 6, question: 'PipedInputStream 和 PipedOutputStream 的连接方式是？', options: ['通过文件连接', '通过 connect() 方法连接', '通过 Socket 连接', '不需要显式连接'], correct: 1, explanation: '需要通过 connect() 方法或构造器将 PipedInputStream 和 PipedOutputStream 配对，实现线程间管道通信。' },
+  { level: 6, question: 'DataInputStream 的主要用途是？', options: ['读取文本', '读取二进制数据并还原为 Java 基本类型', '读取图片', '网络通信'], correct: 1, explanation: 'DataInputStream 用于读取 DataOutputStream 写入的 Java 基本类型数据（int、double、UTF 字符串等）。' }
+]
+
+app.post('/api/ai/generate-question', async (req, res) => {
+  try {
+    const { apiKey, difficulty, usedQuestionHashes } = req.body
+    const level = Math.min(Math.max(parseInt(difficulty) || 1, 1), 6)
+    const usedHashes = usedQuestionHashes || []
+
+    if (apiKey && apiKey.trim()) {
+      try {
+        const topicList = getTopicsByLevel(level)
+        const excludeHint = usedHashes.length > 0
+          ? `已经考过的知识点（题目内容哈希）：${usedHashes.join(',')}。请避开这些知识点，出全新的题目。`
+          : ''
+
+        const prompt = `请生成一道 Java I/O（输入输出流）相关的选择题，难度等级 ${level}/6。
+
+${excludeHint}
+
+难度参考：
+1级=基本概念（InputStream/OutputStream基类识别）
+2级=字符流入门（Reader/Writer/转换流）
+3级=缓冲流原理（BufferedStream/flush/缓冲区机制）
+4级=文件操作与序列化（File/Serializable/try-with-resources）
+5级=NIO基础（Channel/Buffer/Selector）
+6级=高级特性（内存映射/管道流/数据流/RandomAccessFile）
+
+请输出严格的JSON格式（不要Markdown代码块）：
+{"question":"题目内容","options":["A选项","B选项","C选项","D选项"],"correct":0-3,"explanation":"解析"}`
+
+        const aiResponse = await fetch('https://api.deepseek.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'deepseek-chat',
+            messages: [
+              { role: 'system', content: '你是一个 Java I/O 出题专家。严格按JSON格式输出，不要包裹在```中。生成全新不重复的题目。' },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 1024,
+            temperature: 0.9
+          })
+        })
+
+        if (aiResponse.ok) {
+          const data = await aiResponse.json()
+          const raw = data.choices?.[0]?.message?.content || ''
+          const jsonMatch = raw.match(/\{[\s\S]*\}/)
+          if (jsonMatch) {
+            const question = JSON.parse(jsonMatch[0])
+            if (question.question && question.options && question.correct !== undefined) {
+              question.fromAI = true
+              return res.json(question)
+            }
+          }
+        }
+      } catch (aiErr) {
+        console.error('AI 生成题目失败，使用本地题库:', aiErr.message)
+      }
+    }
+
+    const available = localQuestionBank.filter(q => {
+      const hash = simpleHash(q.question)
+      return q.level <= level && !usedHashes.includes(hash)
+    })
+
+    if (available.length === 0) {
+      const allAvailable = localQuestionBank.filter(q => !usedHashes.includes(simpleHash(q.question)))
+      if (allAvailable.length === 0) {
+        const idx = Math.floor(Math.random() * localQuestionBank.length)
+        return res.json({ ...localQuestionBank[idx], fromAI: false })
+      }
+      const pick = allAvailable[Math.floor(Math.random() * allAvailable.length)]
+      return res.json({ ...pick, fromAI: false })
+    }
+
+    const candidates = available.filter(q => q.level === level)
+    const pool = candidates.length >= 2 ? candidates : available
+    const pick = pool[Math.floor(Math.random() * pool.length)]
+    res.json({ ...pick, fromAI: false })
+  } catch (err) {
+    console.error('Generate question error:', err.message)
+    res.status(500).json({ error: '题目生成失败' })
+  }
+})
+
+function simpleHash(str) {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i)
+    hash = ((hash << 5) - hash) + ch
+    hash |= 0
+  }
+  return 'q' + Math.abs(hash).toString(36)
+}
+
+function getTopicsByLevel(level) {
+  const topics = {
+    1: ['InputStream基类', 'OutputStream基类', 'FileInputStream', 'FileOutputStream', 'read方法', 'write方法'],
+    2: ['Reader基类', 'Writer基类', 'FileReader', 'FileWriter', 'InputStreamReader转换流', 'OutputStreamWriter转换流', 'readLine方法', '字符编码'],
+    3: ['BufferedInputStream', 'BufferedOutputStream', 'BufferedReader', 'BufferedWriter', 'flush机制', '缓冲区大小', '缓冲原理'],
+    4: ['File类', 'Files工具类', 'Serializable接口', 'ObjectOutputStream', 'ObjectInputStream', 'transient关键字', 'serialVersionUID', 'try-with-resources', 'AutoCloseable'],
+    5: ['Channel通道', 'Buffer缓冲区', 'Selector选择器', 'FileChannel', 'flip方法', 'clear方法', '非阻塞IO', 'SocketChannel'],
+    6: ['RandomAccessFile', '内存映射MappedByteBuffer', '文件锁定', 'PipedInputStream管道流', 'DataInputStream', 'DataOutputStream', 'PrintWriter', 'SequenceInputStream']
+  }
+  return topics[level] || topics[1]
+}
+
 app.listen(PORT, () => {
   console.log(`🚀 Java I/O Game Server is running on http://localhost:${PORT}`)
   console.log(`📋 API Endpoints:`)
-  console.log(`   GET/POST /api/questions/random  - 随机获取题目`)
-  console.log(`   GET /api/questions/all          - 获取所有题目`)
-  console.log(`   GET /api/questions/level/:level - 按关卡获取题目`)
-  console.log(`   GET /api/achievements           - 获取成就列表`)
-  console.log(`   GET /api/health                 - 健康检查`)
+  console.log(`   GET/POST /api/questions/random       - 随机获取题目`)
+  console.log(`   GET     /api/questions/all           - 获取所有题目`)
+  console.log(`   GET     /api/questions/level/:level  - 按关卡获取题目`)
+  console.log(`   POST    /api/ai/generate-question    - AI 生成题目（支持去重+难度递增）`)
+  console.log(`   POST    /api/ai/chat                 - AI 对话`)
+  console.log(`   GET     /api/achievements            - 获取成就列表`)
+  console.log(`   GET     /api/health                  - 健康检查`)
 })

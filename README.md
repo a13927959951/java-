@@ -20,6 +20,7 @@
 - [关卡介绍](#-关卡介绍)
 - [成就系统](#-成就系统)
 - [C++ 后端编译](#-c-后端编译可选)
+- [更新日志](#-更新日志)
 
 ---
 
@@ -29,11 +30,16 @@
 - **6 大关卡** — 从字节流基础到 NIO 高级特性，层层递进
 - **💖 生命值机制** — 答对 +1 血，答错 -1 血，零血闯关失败
 - **🔥 连击系统** — 连续答对触发 combo，冲击最高连击记录
-- **♾️ 无尽挑战** — 不限关卡，难度递增，随机出题永不重复
+- **♾️ 无尽挑战** — 不限关卡，难度递增，AI 生成题目永不重复
 - **🏅 成就系统** — 8 种成就等你解锁
 
 ### 🧠 学习功能
-- **📚 知识导图** — 可折叠的 Java I/O 思维导图，学完即测
+- **📚 知识导图** — 深度扩展的 Java I/O 思维导图：
+  - 🔍 搜索功能 — 快速定位知识点
+  - 🏷️ 标签筛选 — 按类型过滤（字节流/字符流/NIO/实战）
+  - 📊 学习进度 — 实时追踪学习完成度
+  - 📋 代码复制 — 一键复制示例代码
+  - ✓ 学习标记 — 标记已学章节
 - **🤖 AI 助手** — 深度集成 DeepSeek API，支持：
   - 💬 问答模式 — 解答 Java I/O 疑惑
   - 💻 代码生成 — 生成带注释的完整代码
@@ -42,10 +48,11 @@
   - 🧩 本地知识库 — 无 API 密钥也能用
 
 ### 🎨 用户体验
-- 蓝色主题 UI，动画流畅
-- 答题正确/错误的即时动画反馈
-- localStorage 自动保存游戏进度
-- 响应式设计，适配不同屏幕
+- **🌌 动态粒子背景** — 美观的粒子动画效果
+- **蓝色主题 UI** — 现代感渐变设计
+- **流畅动画反馈** — 答题正确/错误即时动画
+- **localStorage 持久化** — 自动保存游戏进度和成就
+- **响应式设计** — 适配桌面和移动设备
 
 ---
 
@@ -61,6 +68,7 @@
 | **AI 接口** | DeepSeek API | 可选接入，不填密钥用本地知识库 |
 | **C++ 后端** | C++17 + Socket | 可选，需 g++ 编译（代码已提供） |
 | **JSON 库** | nlohmann/json | C++ JSON 解析 |
+| **粒子效果** | Canvas API | 动态粒子背景动画 |
 
 ---
 
@@ -74,11 +82,13 @@ File/
 │   │   │   └── index.js               # 路由配置（5 个路由）
 │   │   ├── stores/
 │   │   │   └── gameStore.js           # Pinia 状态管理
+│   │   ├── components/
+│   │   │   └── ParticleBackground.vue # 动态粒子背景组件
 │   │   ├── views/
 │   │   │   ├── HomeView.vue           # 首页（关卡选择 + 成就）
 │   │   │   ├── GameView.vue           # 关卡答题页
-│   │   │   ├── EndlessView.vue        # 无尽挑战页
-│   │   │   ├── MindmapView.vue        # 知识导图页
+│   │   │   ├── EndlessView.vue        # 无尽挑战页（AI 出题）
+│   │   │   ├── MindmapView.vue        # 知识导图页（深度扩展）
 │   │   │   └── AiAssistantView.vue    # AI 助手页
 │   │   ├── App.vue                    # 根组件
 │   │   └── main.js                    # 入口文件
@@ -96,11 +106,19 @@ File/
 │       └── nlohmann/
 │           └── json.hpp               # nlohmann JSON 库（官方正版）
 │
-└── legacy/                            # 旧版单页面应用（参考）
-    ├── java-io-game.html
-    ├── game.js
-    ├── styles.css
-    └── ...
+├── scripts/                           # 启动脚本
+│   ├── start-all.bat                  # Windows 一键启动
+│   ├── start-all.ps1                  # PowerShell 服务管理
+│   ├── start-backend.bat              # 单独启动后端
+│   └── start-frontend.bat             # 单独启动前端
+│
+├── legacy/                            # 旧版单页面应用（参考）
+│   ├── java-io-game.html
+│   ├── game.js
+│   ├── styles.css
+│   └── ...
+├── .gitignore                         # Git 忽略配置
+└── README.md                          # 项目说明文档
 ```
 
 ---
@@ -112,13 +130,19 @@ File/
 - **Node.js** >= 18.x
 - **npm** >= 9.x
 
-### 1. 克隆项目
+### 方法一：一键启动（推荐）
 
 ```bash
-cd File
+# Windows
+scripts\start-all.bat
+
+# PowerShell
+.\scripts\start-all.ps1 start
 ```
 
-### 2. 启动后端
+### 方法二：手动启动
+
+#### 1. 启动后端
 
 ```bash
 cd backend
@@ -128,7 +152,7 @@ npm start
 
 后端运行在 `http://localhost:8080`
 
-### 3. 启动前端
+#### 2. 启动前端
 
 ```bash
 cd frontend
@@ -138,7 +162,7 @@ npm run dev
 
 前端运行在 `http://localhost:5173`
 
-### 4. 打开浏览器
+#### 3. 打开浏览器
 
 访问 **http://localhost:5173** 开始游戏喵~
 
@@ -154,6 +178,37 @@ npm run dev
 | `GET/POST` | `/api/questions/random` | 随机获取题目（支持 `difficulty` 参数） |
 | `GET` | `/api/achievements` | 获取成就列表 |
 | `POST` | `/api/ai/chat` | AI 对话接口 |
+| `POST` | `/api/ai/generate-question` | AI 题目生成（无尽挑战专用） |
+
+### AI 题目生成接口（无尽挑战）
+
+```json
+POST /api/ai/generate-question
+Content-Type: application/json
+
+{
+  "apiKey": "sk-xxx（可选）",
+  "difficulty": 3,
+  "usedQuestionHashes": ["q1a2b3c", "q4d5e6f"]
+}
+```
+
+- **apiKey**: DeepSeek API 密钥（可选，不填用本地题库）
+- **difficulty**: 难度级别（1-6）
+- **usedQuestionHashes**: 已使用的题目哈希数组（用于去重）
+
+返回示例：
+
+```json
+{
+  "level": 3,
+  "question": "使用缓冲流后，数据写入目标文件的时机是？",
+  "options": ["立即写入", "缓冲区满或调用 flush()/close() 时", "每 1 秒写入一次", "程序结束时写入"],
+  "correct": 1,
+  "explanation": "数据先写入缓冲区，缓冲区满或手动 flush()/close() 时才实际写入。",
+  "fromAI": false
+}
+```
 
 ### AI 对话接口示例
 
@@ -231,12 +286,37 @@ C++ 服务器监听 `http://localhost:8080`
 1. **首页** — 选择关卡卡片开始游戏，或点击「无尽挑战 / 知识导图 / AI 助手」
 2. **答题** — 选择答案，查看即时反馈和解析
 3. **闯关** — 答对足够题目即可通关
-4. **无尽模式** — 无限答题，难度随连续答对数递增
-5. **知识导图** — 展开学习各知识点，学完后点击「开始测验」
+4. **无尽模式** — 无限答题，难度随连续答对 3 题递增一级（最高 6 级）
+5. **知识导图** — 搜索知识点、按标签筛选、标记学习进度、复制代码示例
 6. **AI 助手** — 底部输入 DeepSeek API 密钥（可选），开始智能对话
 
 ---
 
-## 📜 License
+## � 更新日志
+
+### v2.0（2026-05-20）
+- ✅ 修复无尽挑战题号显示错误
+- ✅ 深度扩展思维导图功能（搜索、标签筛选、学习进度、代码复制）
+- ✅ 添加动态粒子背景效果
+- ✅ 整理项目文件结构（脚本移入 scripts/）
+- ✅ 更新 README 文档
+
+### v1.5（2026-05-19）
+- ✅ 实现无尽挑战 AI 题目生成接口
+- ✅ 添加题目去重机制（哈希算法）
+- ✅ 实现难度递增逻辑（每 3 连击 +1 级）
+- ✅ 集成 DeepSeek API 支持
+
+### v1.0（2026-05-18）
+- ✅ Vue3 + Express 全栈架构
+- ✅ 6 大关卡设计
+- ✅ 生命值与连击系统
+- ✅ 成就系统
+- ✅ 知识导图
+- ✅ AI 助手
+
+---
+
+## �📜 License
 
 MIT License — 仅供学习交流使用喵~
