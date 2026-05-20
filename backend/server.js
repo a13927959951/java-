@@ -108,16 +108,14 @@ const questions = [
 
 // 成就系统数据
 const achievements = [
-  { id: 1, name: '初次启程', description: '完成第1关', icon: '🌟' },
-  { id: 2, name: '流之使者', description: '完成第2关', icon: '🌊' },
-  { id: 3, name: '缓冲大师', description: '完成第3关', icon: '⚡' },
-  { id: 4, name: '文件掌控者', description: '完成第4关', icon: '📁' },
-  { id: 5, name: 'NIO探索者', description: '完成第5关', icon: '🚀' },
-  { id: 6, name: '知识达人', description: '通过知识导图测验', icon: '🧠' },
-  { id: 7, name: '满分选手', description: '任一关卡满分通关', icon: '💯' },
-  { id: 8, name: '无尽勇士', description: '无尽模式连续答对10题', icon: '♾️' },
-  { id: 9, name: 'Java I/O大师', description: '通过全部关卡', icon: '👑' },
-  { id: 10, name: '终身学习者', description: '累计答对50题', icon: '📚' }
+  { id: 1, name: '初露锋芒', description: '答对第一道题', icon: '⭐' },
+  { id: 2, name: '新手入门', description: '完成第一个模块', icon: '🎯' },
+  { id: 3, name: '完美通关', description: '一模块内全部答对', icon: '💯' },
+  { id: 4, name: '通关大师', description: '完成所有8个模块', icon: '🏆' },
+  { id: 5, name: '连击高手', description: '连续答对10题', icon: '🔥' },
+  { id: 6, name: '答题达人', description: '累计答对20题', icon: '📚' },
+  { id: 7, name: '无尽挑战者', description: '无尽模式答对15题', icon: '♾️' },
+  { id: 8, name: '知识探索者', description: '学习知识导图', icon: '📖' }
 ]
 
 app.get('/api/questions/random', (req, res) => {
@@ -159,10 +157,10 @@ app.get('/api/health', (req, res) => {
 })
 
 const rolePrompts = {
-  general: '你是一个专业的 Java 编程助手，擅长解答 Java 输入输出（I/O）相关问题。请用中文回答，保持专业且友好。',
+  general: '你是一个专业的 Java 编程助手，擅长解答 Java 全知识点问题，包括基础语法、面向对象、集合框架、多线程、I/O、数据库、网络编程等。请用中文回答，保持专业且友好。',
   code: '你是一个 Java 代码生成专家。请根据用户需求生成高质量的 Java 代码，必须包含详细的中文注释。代码要完整、可运行。',
-  question: '你是一个 Java 出题专家。请根据用户需求生成 Java I/O 相关的选择题，格式为：题目\nA. 选项1\nB. 选项2\nC. 选项3\nD. 选项4\n正确答案：X\n解析：...',
-  ioExpert: '你是 Java I/O 领域的顶级专家。请深入详细地解答关于 Java 输入输出流、NIO、文件操作、序列化、字符编码等问题。用中文回答，举例说明。'
+  question: '你是一个 Java 出题专家。请根据用户需求生成 Java 全知识点相关的选择题，格式为：题目\nA. 选项1\nB. 选项2\nC. 选项3\nD. 选项4\n正确答案：X\n解析：...',
+  javaExpert: '你是 Java 领域的顶级专家。请深入详细地解答关于 Java 基础、面向对象、集合、多线程、I/O、数据库、网络编程等问题。用中文回答，举例说明。'
 }
 
 app.post('/api/ai/chat', async (req, res) => {
@@ -350,48 +348,161 @@ try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("person.s
 ⚠️ \`transient\` 关键字标记的字段不会被序列化。`
   }
 
-  return `你好！我是 Java I/O AI 助手喵~ 🐱
+  if (msg.includes('arraylist') || msg.includes('linkedlist') || msg.includes('list')) {
+    return `📦 **Java List接口**常用实现类对比：
+
+| 实现类 | 底层结构 | 优点 | 缺点 |
+|--------|----------|------|------|
+| \`ArrayList\` | 动态数组 | 随机访问快 | 插入删除慢 |
+| \`LinkedList\` | 双向链表 | 插入删除快 | 随机访问慢 |
+
+**ArrayList 使用示例：**
+\`\`\`java
+List<String> list = new ArrayList<>();
+list.add("Java");
+list.add("Python");
+for (String item : list) {
+    System.out.println(item);
+}
+\`\`\`
+
+**推荐场景：** 读多写少用ArrayList，写多读少用LinkedList。`
+  }
+
+  if (msg.includes('hashmap') || msg.includes('map') || msg.includes('集合')) {
+    return `📦 **Java Map接口**常用实现类：
+
+| 实现类 | 特点 |
+|--------|------|
+| \`HashMap\` | 无序，允许null键值，非线程安全 |
+| \`TreeMap\` | 按键自然排序，不允许null键 |
+| \`LinkedHashMap\` | 保持插入顺序 |
+| \`ConcurrentHashMap\` | 线程安全，分段锁实现 |
+
+**HashMap 使用示例：**
+\`\`\`java
+Map<String, Integer> map = new HashMap<>();
+map.put("age", 25);
+int age = map.get("age"); // 返回 25
+\`\`\`
+
+⚠️ HashMap 在 Java 8 后采用数组+链表/红黑树结构，减少哈希冲突。`
+  }
+
+  if (msg.includes('线程') || msg.includes('thread') || msg.includes('runnable')) {
+    return `🧵 **Java 多线程**创建方式：
+
+**方式一：实现 Runnable 接口（推荐）**
+\`\`\`java
+Thread thread = new Thread(() -> {
+    System.out.println("线程执行中");
+});
+thread.start();
+\`\`\`
+
+**方式二：继承 Thread 类**
+\`\`\`java
+class MyThread extends Thread {
+    public void run() {
+        System.out.println("线程执行中");
+    }
+}
+new MyThread().start();
+\`\`\`
+
+**常用方法：**
+- \`start()\` - 启动线程
+- \`run()\` - 线程执行体
+- \`sleep(long ms)\` - 线程休眠
+- \`join()\` - 等待线程结束`
+  }
+
+  if (msg.includes('synchronized') || msg.includes('volatile') || msg.includes('同步')) {
+    return `🔒 **Java 线程同步**机制：
+
+**1. synchronized 关键字**
+- 保证原子性、可见性、有序性
+- 可修饰方法或代码块
+
+\`\`\`java
+// 同步方法
+synchronized void increment() {
+    count++;
+}
+
+// 同步代码块
+synchronized(this) {
+    count++;
+}
+\`\`\`
+
+**2. volatile 关键字**
+- 保证可见性和有序性
+- **不保证原子性**
+
+\`\`\`java
+volatile boolean flag = false;
+\`\`\`
+
+**3. Lock 接口** - 更灵活的锁机制（ReentrantLock）`
+  }
+
+  return `你好！我是 Java 全能学习助手喵~ 🐱
 
 我可以帮你解答以下方面的知识：
-- 📥 **字节流**（InputStream/OutputStream）
-- 📝 **字符流**（Reader/Writer）
-- ⚡ **缓冲流**（BufferedStream）
-- 🚀 **NIO**（Channel/Buffer/Selector）
-- 📦 **序列化**（ObjectStream）
-- 📁 **文件操作**（File/Files）
-- 🔒 **try-with-resources** 资源管理
+- 📚 **Java基础**（数据类型、运算符、流程控制）
+- 🏠 **面向对象**（封装、继承、多态、接口）
+- 📦 **集合框架**（List、Set、Map）
+- ⚠️ **异常处理**（try-catch、自定义异常）
+- 🧵 **多线程**（Thread、Runnable、并发工具）
+- 💾 **Java I/O**（字节流、字符流、NIO）
+- 🗄️ **数据库**（JDBC、SQL、连接池）
+- 🌐 **网络编程**（Socket、HTTP、TCP/IP）
 
 💡 **提示：** 设置 DeepSeek API 密钥后，我可以调用 AI 大模型提供更智能的回答！只需免费注册 DeepSeek 获取密钥即可喵~`
 }
 
 const questionPool = {}
 const localQuestionBank = [
+  // ========== Java基础 ==========
+  { level: 1, question: 'Java中，int类型占用多少字节？', options: ['2字节', '4字节', '8字节', '1字节'], correct: 1, explanation: 'int类型在Java中占用4字节，范围是-2^31到2^31-1。' },
+  { level: 1, question: '以下哪个不是Java的基本数据类型？', options: ['int', 'String', 'boolean', 'double'], correct: 1, explanation: 'String是引用类型，不是基本数据类型。Java的8种基本类型是：byte、short、int、long、float、double、char、boolean。' },
+  { level: 1, question: 'Java中的==和equals()方法的区别？', options: ['没有区别', '==比较引用，equals比较内容', '==比较内容，equals比较引用', '两者都比较引用'], correct: 1, explanation: '==对于基本类型比较值，对于引用类型比较内存地址；equals()默认比较引用，但可重写比较内容。' },
+  { level: 1, question: 'Java中，以下哪个关键字用于定义常量？', options: ['const', 'final', 'static', 'constant'], correct: 1, explanation: 'final关键字用于定义常量，const是Java保留关键字但未使用。' },
+  // ========== 面向对象 ==========
+  { level: 2, question: 'Java中，子类继承父类使用哪个关键字？', options: ['implements', 'extends', 'inherits', 'super'], correct: 1, explanation: 'extends关键字用于类的继承，implements用于实现接口。' },
+  { level: 2, question: '以下哪个访问修饰符只对同包类可见？', options: ['public', 'private', 'protected', 'default'], correct: 3, explanation: '默认（包访问权限）只对同包类可见，protected对同包类和子类可见。' },
+  { level: 2, question: 'abstract方法的特点是？', options: ['有方法体', '没有方法体', '必须是static', '必须是private'], correct: 1, explanation: 'abstract方法只有声明没有实现（方法体），必须在抽象类中。' },
+  { level: 2, question: '接口中定义的方法默认是什么修饰符？', options: ['private', 'protected', 'public abstract', 'default'], correct: 2, explanation: '接口中的方法默认是public abstract，Java 8+还支持default和static方法。' },
+  // ========== 集合框架 ==========
+  { level: 3, question: 'ArrayList和LinkedList的主要区别是？', options: ['没有区别', 'ArrayList基于数组，LinkedList基于链表', 'ArrayList更快', 'LinkedList更节省内存'], correct: 1, explanation: 'ArrayList基于动态数组实现，随机访问快；LinkedList基于双向链表，插入删除快。' },
+  { level: 3, question: 'HashMap允许null键和null值吗？', options: ['都不允许', '允许null键，不允许null值', '不允许null键，允许null值', '都允许'], correct: 3, explanation: 'HashMap允许一个null键和多个null值，Hashtable不允许任何null。' },
+  { level: 3, question: 'HashSet的底层实现是？', options: ['数组', '链表', 'HashMap', '红黑树'], correct: 2, explanation: 'HashSet底层使用HashMap实现，元素作为key存储，value是一个固定的Object。' },
+  { level: 3, question: '遍历Map的方式有哪些？', options: ['只能用Iterator', '只能用for循环', '可以用entrySet()或keySet()', '无法遍历'], correct: 2, explanation: '可以通过entrySet()遍历键值对，或通过keySet()遍历键。' },
+  // ========== 异常处理 ==========
+  { level: 4, question: 'try-catch-finally中，finally块何时执行？', options: ['只有异常时执行', '只有无异常时执行', '无论是否异常都执行', '永不执行'], correct: 2, explanation: 'finally块无论是否发生异常都会执行，除非调用System.exit()。' },
+  { level: 4, question: 'RuntimeException和Exception的区别是？', options: ['没有区别', 'RuntimeException不需要显式处理', 'Exception不需要显式处理', 'RuntimeException是检查异常'], correct: 1, explanation: 'RuntimeException是非检查异常，不需要显式捕获或声明throws。' },
+  { level: 4, question: 'throw和throws的区别？', options: ['没有区别', 'throw抛出异常对象，throws声明异常', 'throw声明异常，throws抛出异常', '都是关键字用法相同'], correct: 1, explanation: 'throw用于抛出具体异常对象，throws用于方法签名中声明可能抛出的异常。' },
+  // ========== 多线程 ==========
+  { level: 5, question: '创建线程的两种方式是？', options: ['继承Thread和实现Runnable', '继承Runnable和实现Thread', '只有继承Thread', '只有实现Runnable'], correct: 0, explanation: '创建线程有两种方式：继承Thread类或实现Runnable接口，推荐使用Runnable（避免单继承限制）。' },
+  { level: 5, question: 'synchronized关键字的作用是？', options: ['加速代码执行', '保证线程安全，实现同步', '创建线程', '终止线程'], correct: 1, explanation: 'synchronized用于实现线程同步，保证同一时刻只有一个线程执行同步代码块。' },
+  { level: 5, question: 'volatile关键字的作用是？', options: ['实现原子操作', '保证可见性和禁止重排序', '实现线程同步', '创建线程'], correct: 1, explanation: 'volatile保证变量的可见性（一个线程修改后其他线程立即可见），并禁止指令重排序。' },
+  { level: 5, question: 'Java线程的状态有几种？', options: ['3种', '4种', '5种', '6种'], correct: 3, explanation: 'Java线程有6种状态：NEW、RUNNABLE、BLOCKED、WAITING、TIMED_WAITING、TERMINATED。' },
+  // ========== Java I/O ==========
   { level: 1, question: 'Java中哪个类是所有字节输入流的抽象基类？', options: ['OutputStream', 'InputStream', 'Reader', 'Writer'], correct: 1, explanation: 'InputStream 是所有字节输入流的抽象基类。' },
-  { level: 1, question: 'FileInputStream 主要用于什么场景？', options: ['读取文本文件', '读取二进制文件', '写入文件', '网络通信'], correct: 1, explanation: 'FileInputStream 以字节流方式读取任意文件，尤其适合二进制文件（图片、视频等）。' },
-  { level: 1, question: 'InputStream.read() 方法一次读取多少数据？', options: ['一个字符', '一个字节', '一行', '所有数据'], correct: 1, explanation: 'read() 方法每次读取一个字节（0-255），返回 -1 表示文件结束。' },
-  { level: 1, question: 'OutputStream 的 write(int b) 参数类型是？', options: ['byte', 'int', 'char', 'short'], correct: 1, explanation: 'write(int b) 虽然接受 int 参数，但只写入低 8 位（一个字节）。' },
   { level: 2, question: 'FileReader 和 FileInputStream 的主要区别是什么？', options: ['没有区别', 'FileReader 按字符读取，FileInputStream 按字节读取', 'FileReader 更快', 'FileInputStream 只能读文本'], correct: 1, explanation: 'FileReader 是字符流，按字符（16位Unicode）读取；FileInputStream 是字节流。' },
-  { level: 2, question: 'InputStreamReader 的核心作用是什么？', options: ['加速读取', '将字节流转换为字符流', '将字符流转换为字节流', '缓冲数据'], correct: 1, explanation: 'InputStreamReader 是字节流到字符流的桥梁，可将字节解码为字符。' },
-  { level: 2, question: 'BufferedReader 的 readLine() 读到末尾返回什么？', options: ['-1', 'null', '空字符串', '抛出异常'], correct: 1, explanation: 'readLine() 读取一行返回 String，到达末尾时返回 null。' },
-  { level: 2, question: 'Writer 和 OutputStream 的关系是？', options: ['Writer 继承 OutputStream', 'Writer 是字符输出流的基类', '两者完全相同', 'OutputStream 是字符流'], correct: 1, explanation: 'Writer 是所有字符输出流的抽象基类，OutputStream 是字节输出流的基类。' },
   { level: 3, question: 'BufferedInputStream 默认缓冲区大小为？', options: ['1024字节', '4096字节', '8192字节', '16384字节'], correct: 2, explanation: 'BufferedInputStream 默认缓冲区为 8192 字节（8KB）。' },
-  { level: 3, question: 'BufferedWriter 的 flush() 方法作用是什么？', options: ['关闭流', '清空文件内容', '强制将缓冲区数据写入目标', '删除缓冲区'], correct: 2, explanation: 'flush() 将缓冲区中的数据强制刷新到底层输出流。' },
-  { level: 3, question: '以下关于缓冲流的描述哪个是错误的？', options: ['缓冲流能减少实际 I/O 操作', '缓冲流默认缓冲区 8KB', '缓冲流只能用于文件操作', '缓冲流包装在基础流之上'], correct: 2, explanation: '缓冲流不仅用于文件，也适用于网络流等任何 I/O 操作。' },
-  { level: 3, question: '使用缓冲流后，数据写入目标文件的时机是？', options: ['立即写入', '缓冲区满或调用 flush()/close() 时', '每 1 秒写入一次', '程序结束时写入'], correct: 1, explanation: '数据先写入缓冲区，缓冲区满或手动 flush()/close() 时才实际写入。' },
   { level: 4, question: 'Java 序列化需要实现哪个接口？', options: ['Cloneable', 'Serializable', 'Closeable', 'Comparable'], correct: 1, explanation: '要实现 Java 对象序列化，类必须实现 java.io.Serializable 接口。' },
-  { level: 4, question: 'transient 关键字的作用是？', options: ['加速序列化', '标记字段不参与序列化', '标记字段必须序列化', '改变序列化顺序'], correct: 1, explanation: 'transient 修饰的字段在序列化时会被忽略，不会被写入输出流。' },
-  { level: 4, question: 'try-with-resources 要求资源必须实现什么接口？', options: ['Closeable', 'AutoCloseable', 'Serializable', 'Flushable'], correct: 1, explanation: 'try-with-resources 要求资源实现 AutoCloseable 接口（Java 7 引入）。' },
-  { level: 4, question: 'serialVersionUID 的作用是什么？', options: ['标识序列化版本', '控制序列化顺序', '决定文件大小', '加密序列化数据'], correct: 0, explanation: 'serialVersionUID 用于验证序列化对象的版本兼容性，不匹配会抛出 InvalidClassException。' },
-  { level: 5, question: 'Java NIO 中 Channel 与 Stream 的根本区别是？', options: ['Channel 更快', 'Channel 是双向的，Stream 是单向的', 'Channel 只能读', 'Channel 只能写'], correct: 1, explanation: 'Channel 支持双向读写，而传统的 Stream 是单向的（InputStream 只读，OutputStream 只写）。' },
-  { level: 5, question: 'Buffer.flip() 方法执行后会发生什么？', options: ['清空缓冲区', 'limit=position，position=0', 'position=limit，limit=0', '重置所有数据'], correct: 1, explanation: 'flip() 将 limit 设为 position，position 归零，从写模式切换到读模式。' },
-  { level: 5, question: 'Selector 在 NIO 中的作用是？', options: ['选择文件', '单线程管理多个 Channel', '选择缓冲区', '选择编码方式'], correct: 1, explanation: 'Selector 是多路复用器，允许单线程同时监控多个 Channel 的 I/O 事件。' },
-  { level: 5, question: 'Buffer.remaining() 返回什么？', options: ['总容量', '已写入的元素数', '可读/可写的剩余元素数', '缓冲区位置'], correct: 2, explanation: 'remaining() 返回 limit - position 的值，即可读（或可写）的剩余元素数量。' },
-  { level: 6, question: 'Java NIO 的 FileChannel 相比传统 FileInputStream 的优势？', options: ['更简单', '支持内存映射和文件锁定', '只能顺序读取', '不需要关闭'], correct: 1, explanation: 'FileChannel 支持内存映射（MappedByteBuffer）、文件区域锁定、随机位置读写等高级特性。' },
-  { level: 6, question: 'RandomAccessFile 的 "rw" 模式表示什么？', options: ['只读', '只写', '读写', '读写追加'], correct: 2, explanation: '"rw" 模式表示以可读写方式打开文件，文件不存在时会自动创建。' },
-  { level: 6, question: '以下哪个场景最不适合用字节流处理？', options: ['复制图片文件', '读取纯中文文本并逐行显示', '下载网络文件', '序列化对象'], correct: 1, explanation: '读取中文文本应使用字符流（如 BufferedReader/FileReader），字节流按字节读取可能破坏多字节字符。' },
-  { level: 6, question: 'PrintWriter 与 BufferedWriter 的主要区别？', options: ['没有区别', 'PrintWriter 提供格式化输出方法（print/println）', 'BufferedWriter 更快', 'PrintWriter 只能写字节'], correct: 1, explanation: 'PrintWriter 提供 print()/println()/printf() 等便捷方法，且默认自动刷新。' },
-  { level: 6, question: 'PipedInputStream 和 PipedOutputStream 的连接方式是？', options: ['通过文件连接', '通过 connect() 方法连接', '通过 Socket 连接', '不需要显式连接'], correct: 1, explanation: '需要通过 connect() 方法或构造器将 PipedInputStream 和 PipedOutputStream 配对，实现线程间管道通信。' },
-  { level: 6, question: 'DataInputStream 的主要用途是？', options: ['读取文本', '读取二进制数据并还原为 Java 基本类型', '读取图片', '网络通信'], correct: 1, explanation: 'DataInputStream 用于读取 DataOutputStream 写入的 Java 基本类型数据（int、double、UTF 字符串等）。' }
+  { level: 5, question: 'Java NIO 中 Channel 与 Stream 的根本区别是？', options: ['Channel 更快', 'Channel 是双向的，Stream 是单向的', 'Channel 只能读', 'Channel 只能写'], correct: 1, explanation: 'Channel 支持双向读写，而传统的 Stream 是单向的。' },
+  { level: 6, question: 'Java NIO 的 FileChannel 相比传统 FileInputStream 的优势？', options: ['更简单', '支持内存映射和文件锁定', '只能顺序读取', '不需要关闭'], correct: 1, explanation: 'FileChannel 支持内存映射、文件区域锁定、随机位置读写等高级特性。' },
+  // ========== 数据库 ==========
+  { level: 6, question: 'JDBC中，用于执行SQL语句的对象是？', options: ['Connection', 'Statement', 'ResultSet', 'Driver'], correct: 1, explanation: 'Statement用于执行静态SQL语句，PreparedStatement用于预编译SQL。' },
+  { level: 6, question: 'PreparedStatement相比Statement的优势是？', options: ['更慢', '防止SQL注入', '只能执行简单SQL', '无法使用参数'], correct: 1, explanation: 'PreparedStatement预编译SQL，支持参数化查询，可有效防止SQL注入攻击。' },
+  { level: 6, question: 'JDBC的连接步骤是？', options: ['执行SQL→建立连接→关闭资源', '加载驱动→建立连接→执行SQL→处理结果→关闭资源', '直接执行SQL', '只需要建立连接'], correct: 1, explanation: 'JDBC标准步骤：加载驱动→建立连接→创建Statement→执行SQL→处理ResultSet→关闭资源。' },
+  // ========== 网络编程 ==========
+  { level: 6, question: 'Java中创建TCP服务端需要使用哪个类？', options: ['Socket', 'ServerSocket', 'DatagramSocket', 'URL'], correct: 1, explanation: 'ServerSocket用于创建TCP服务端，监听指定端口并接受客户端连接。' },
+  { level: 6, question: 'TCP和UDP的主要区别是？', options: ['没有区别', 'TCP可靠有序，UDP不可靠但快', 'UDP可靠有序', 'TCP更快'], correct: 1, explanation: 'TCP是面向连接的可靠协议，保证数据有序到达；UDP是无连接的不可靠协议，但速度更快。' },
+  { level: 6, question: 'Java 11引入的HttpClient属于哪个包？', options: ['java.net', 'java.net.http', 'java.io', 'java.nio'], correct: 1, explanation: 'Java 11引入的HttpClient位于java.net.http包，提供现代化的HTTP客户端API。' }
 ]
 
 app.post('/api/ai/generate-question', async (req, res) => {
@@ -407,17 +518,17 @@ app.post('/api/ai/generate-question', async (req, res) => {
           ? `已经考过的知识点（题目内容哈希）：${usedHashes.join(',')}。请避开这些知识点，出全新的题目。`
           : ''
 
-        const prompt = `请生成一道 Java I/O（输入输出流）相关的选择题，难度等级 ${level}/6。
+        const prompt = `请生成一道 Java 编程相关的选择题，难度等级 ${level}/6。
 
 ${excludeHint}
 
 难度参考：
-1级=基本概念（InputStream/OutputStream基类识别）
-2级=字符流入门（Reader/Writer/转换流）
-3级=缓冲流原理（BufferedStream/flush/缓冲区机制）
-4级=文件操作与序列化（File/Serializable/try-with-resources）
-5级=NIO基础（Channel/Buffer/Selector）
-6级=高级特性（内存映射/管道流/数据流/RandomAccessFile）
+1级=Java基础（数据类型、运算符、流程控制、基本概念）
+2级=面向对象（封装、继承、多态、接口、访问修饰符）
+3级=集合框架（List/Set/Map、ArrayList/HashMap等实现类）
+4级=异常处理（try-catch-finally、异常分类、自定义异常）
+5级=多线程编程（Thread/Runnable、synchronized、volatile、并发工具）
+6级=高级综合（Java I/O、JDBC数据库、网络编程、NIO等）
 
 请输出严格的JSON格式（不要Markdown代码块）：
 {"question":"题目内容","options":["A选项","B选项","C选项","D选项"],"correct":0-3,"explanation":"解析"}`
@@ -431,7 +542,7 @@ ${excludeHint}
           body: JSON.stringify({
             model: 'deepseek-chat',
             messages: [
-              { role: 'system', content: '你是一个 Java I/O 出题专家。严格按JSON格式输出，不要包裹在```中。生成全新不重复的题目。' },
+              { role: 'system', content: '你是一个 Java 全知识点出题专家。严格按JSON格式输出，不要包裹在```中。生成全新不重复的题目，涵盖Java基础、面向对象、集合、多线程、I/O、数据库、网络等知识点。' },
               { role: 'user', content: prompt }
             ],
             max_tokens: 1024,
@@ -504,7 +615,7 @@ function getTopicsByLevel(level) {
 }
 
 app.listen(PORT, () => {
-  console.log(`🚀 Java I/O Game Server is running on http://localhost:${PORT}`)
+  console.log(`🚀 Java 学习闯关游戏 Server is running on http://localhost:${PORT}`)
   console.log(`📋 API Endpoints:`)
   console.log(`   GET/POST /api/questions/random       - 随机获取题目`)
   console.log(`   GET     /api/questions/all           - 获取所有题目`)

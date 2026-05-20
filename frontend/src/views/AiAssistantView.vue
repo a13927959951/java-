@@ -4,8 +4,8 @@
       <button class="home-btn" @click="goHome">🏠 返回首页</button>
 
       <div class="chat-header">
-        <h1>🤖 Java I/O AI 助手</h1>
-        <p>有问题随时问我喵~ 支持 Java I/O 问答、代码生成和题目生成</p>
+        <h1>🤖 Java 全能学习助手</h1>
+        <p>有问题随时问我喵~ 支持 Java 全知识点问答、代码生成和题目生成</p>
       </div>
 
       <div class="chat-body" ref="chatBody">
@@ -86,10 +86,10 @@ const currentRole = ref('general')
 const messages = ref([])
 
 const roles = [
-  { id: 'general', label: '问答', icon: '💬', desc: '普通问答模式' },
-  { id: 'code', label: '代码', icon: '💻', desc: '代码生成模式' },
+  { id: 'general', label: '问答', icon: '💬', desc: 'Java全知识点问答' },
+  { id: 'code', label: '代码', icon: '💻', desc: 'Java代码生成' },
   { id: 'question', label: '出题', icon: '📝', desc: '题目生成模式' },
-  { id: 'ioExpert', label: '专家', icon: '🔧', desc: 'I/O 专家模式' }
+  { id: 'javaExpert', label: '专家', icon: '🔧', desc: 'Java专家模式' }
 ]
 
 onMounted(() => {
@@ -101,16 +101,17 @@ onMounted(() => {
 
   messages.value.push({
     role: 'assistant',
-    content: `你好！我是 **Java I/O AI 助手**喵~ 🐱
+    content: `你好！我是 **Java 全能学习助手**喵~ 🐱
 
 我可以帮你解答以下方面的知识：
-- 📥 **字节流**（InputStream / OutputStream）
-- 📝 **字符流**（Reader / Writer）
-- ⚡ **缓冲流**（BufferedStream）
-- 🚀 **NIO**（Channel / Buffer / Selector）
-- 📦 **序列化**（ObjectStream）
-- 📁 **文件操作**（File / Files）
-- 🔒 **try-with-resources** 资源管理
+- 📚 **Java基础**（数据类型、运算符、流程控制）
+- 🏠 **面向对象**（封装、继承、多态、接口）
+- 📦 **集合框架**（List、Set、Map）
+- ⚠️ **异常处理**（try-catch、自定义异常）
+- 🧵 **多线程**（Thread、Runnable、并发工具）
+- 💾 **Java I/O**（字节流、字符流、NIO）
+- 🗄️ **数据库**（JDBC、SQL、连接池）
+- 🌐 **网络编程**（Socket、HTTP、TCP/IP）
 
 💡 **提示：** 在底部输入 DeepSeek API 密钥可获得更强大的 AI 回答！不填密钥也能使用本地知识库喵~`
   })
