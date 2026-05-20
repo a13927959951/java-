@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java I/O 闯关挑战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="achievement-notification" id="achievementNotification">
+        <span class="icon">🏆</span>
+        <div>
+            <strong>成就解锁！</strong><br>
+            <span id="achievementNotificationText"></span>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="header">
+            <h1>🚀 Java I/O 闯关挑战</h1>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-icon">⭐</span>
+                    <span>分数: <span id="score">0</span></span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">🏆</span>
+                    <span>关卡: <span id="level">1</span>/6</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">❤️</span>
+                    <span>生命: <span id="lives">3</span></span>
+                </div>
+                <div class="stat" id="comboStat" style="display: none;">
+                    <span class="stat-icon">🔥</span>
+                    <span>连击: <span id="combo">0</span></span>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="game-content">
+            <div id="startScreen" class="start-screen">
+                <div class="stream-icon">📦</div>
+                <h2>欢迎来到 Java I/O 闯关挑战！</h2>
+                <p>这是一个帮助你学习 Java 输入输出机制的小游戏</p>
+                <p>共有 <strong>6 个关卡</strong>，还有 <strong>无尽挑战模式</strong> 等你探索！</p>
+
+                <div class="level-preview">
+                    <div class="level-card" onclick="startLevel(0)">
+                        <h3>第1关</h3>
+                        <p>字节流基础</p>
+                    </div>
+                    <div class="level-card" onclick="startLevel(1)">
+                        <h3>第2关</h3>
+                        <p>字符流入门</p>
+                    </div>
+                    <div class="level-card" onclick="startLevel(2)">
+                        <h3>第3关</h3>
+                        <p>缓冲流进阶</p>
+                    </div>
+                    <div class="level-card" onclick="startLevel(3)">
+                        <h3>第4关</h3>
+                        <p>文件流实战</p>
+                    </div>
+                    <div class="level-card" onclick="startLevel(4)">
+                        <h3>第5关</h3>
+                        <p>NIO新世界</p>
+                    </div>
+                    <div class="level-card" onclick="startLevel(5)">
+                        <h3>第6关</h3>
+                        <p>综合挑战</p>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn show" onclick="startGame()">🎯 开始挑战</button>
+                    <button class="btn btn-secondary show" onclick="startEndlessMode()">♾️ 无尽挑战</button>
+                    <button class="btn btn-secondary show" onclick="showMindmap()">📚 知识导图</button>
+                    <button class="btn btn-secondary show" onclick="openAiAssistant()">🤖 AI 助手</button>
+                </div>
+
+                <div class="achievements-panel">
+                    <div class="achievements-title">🏅 成就系统</div>
+                    <div class="achievements-list" id="achievementsList"></div>
+                </div>
+            </div>
+
+            <div id="mindmapScreen" class="mindmap-screen hidden">
+                <div class="mindmap-container">
+                    <h2 class="mindmap-title">🗺️ Java I/O 知识导图</h2>
+                    
+                    <div class="mindmap-item">
+                        <h3 onclick="toggleMindmap(this)">📥 1. 字节流体系</h3>
+                        <div class="mindmap-content">
+                            <p><strong>核心概念：</strong>以字节（8位）为单位进行读写，适合处理二进制数据（图片、视频、文件等）。</p>
+                            <p><strong>InputStream（输入流基类）：</strong></p>
+                            <ul>
+                                <li><code>FileInputStream</code> - 文件输入流</li>
+                                <li><code>BufferedInputStream</code> - 缓冲输入流，提高效率</li>
+                                <li><code>ObjectInputStream</code> - 对象反序列化</li>
+                            </ul>
+                            <p><strong>OutputStream（输出流基类）：</strong></p>
+                            <ul>
+                                <li><code>FileOutputStream</code> - 文件输出流</li>
+                                <li><code>BufferedOutputStream</code> - 缓冲输出流</li>
+                                <li><code>ObjectOutputStream</code> - 对象序列化</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mindmap-item">
+                        <h3 onclick="toggleMindmap(this)">📝 2. 字符流体系</h3>
+                        <div class="mindmap-content">
+                            <p><strong>核心概念：</strong>以字符（16位Unicode）为单位进行读写，适合处理文本数据，支持中文等多语言。</p>
+                            <p><strong>Reader（输入流基类）：</strong></p>
+                            <ul>
+                                <li><code>FileReader</code> - 文件字符输入流</li>
+                                <li><code>BufferedReader</code> - 缓冲字符输入流，提供 readLine() 方法</li>
+                                <li><code>InputStreamReader</code> - 字节流转字符流的桥梁</li>
+                            </ul>
+                            <p><strong>Writer（输出流基类）：</strong></p>
+                            <ul>
+                                <li><code>FileWriter</code> - 文件字符输出流</li>
+                                <li><code>BufferedWriter</code> - 缓冲字符输出流</li>
+                                <li><code>OutputStreamWriter</code> - 字符流转字节流的桥梁</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mindmap-item">
+                        <h3 onclick="toggleMindmap(this)">⚡ 3. 缓冲流</h3>
+                        <div class="mindmap-content">
+                            <p><strong>核心概念：</strong>使用内部缓冲区减少对底层流的直接 I/O 操作，大幅提高读写效率。</p>
+                            <p><strong>关键知识点：</strong></p>
+                            <ul>
+                                <li>缓冲区大小通常为 8KB</li>
+                                <li>缓冲区满时自动刷新（flush）到磁盘</li>
+                                <li>手动调用 flush() 可强制刷新缓冲区</li>
+                                <li><code>newLine()</code> 方法可跨平台写入换行符</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mindmap-item">
+                        <h3 onclick="toggleMindmap(this)">📁 4. 文件操作</h3>
+                        <div class="mindmap-content">
+                            <p><strong>File 类：</strong>表示文件或目录的抽象路径，可进行文件操作（创建、删除、查询等）。</p>
+                            <p><strong>try-with-resources：</strong></p>
+                            <ul>
+                                <li>Java 7+ 引入的语法</li>
+                                <li>自动关闭实现了 AutoCloseable 接口的资源</li>
+                                <li>即使发生异常也能正确关闭资源</li>
+                            </ul>
+                            <p><strong>常见异常：</strong></p>
+                            <ul>
+                                <li><code>FileNotFoundException</code> - 文件不存在</li>
+                                <li><code>IOException</code> - I/O 操作失败</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mindmap-item">
+                        <h3 onclick="toggleMindmap(this)">🔮 5. NIO (New I/O)</h3>
+                        <div class="mindmap-content">
+                            <p><strong>核心组件：</strong></p>
+                            <ul>
+                                <li><strong>Buffer（缓冲区）</strong> - 数据的临时存储容器</li>
+                                <li><strong>Channel（通道）</strong> - 数据的读写通道，支持双向操作</li>
+                                <li><strong>Selector（选择器）</strong> - 多路复用，适合高并发网络编程</li>
+                            </ul>
+                            <p><strong>Buffer 关键方法：</strong></p>
+                            <ul>
+                                <li><code>flip()</code> - 切换到读模式（limit=position, position=0）</li>
+                                <li><code>clear()</code> - 清空缓冲区（切换到写模式）</li>
+                                <li><code>compact()</code> - 压缩，保留未读数据</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mindmap-item">
+                        <h3 onclick="toggleMindmap(this)">💡 6. 最佳实践</h3>
+                        <div class="mindmap-content">
+                            <p><strong>选择合适的流：</strong></p>
+                            <ul>
+                                <li>二进制文件 → 字节流</li>
+                                <li>文本文件（含中文）→ 字符流</li>
+                                <li>大文件 → 缓冲流 + 合理缓冲区大小</li>
+                            </ul>
+                            <p><strong>资源管理：</strong></p>
+                            <ul>
+                                <li>始终使用 try-with-resources</li>
+                                <li>不要忘记关闭流</li>
+                            </ul>
+                            <p><strong>编码处理：</strong></p>
+                            <ul>
+                                <li>注意字符编码（UTF-8、GBK等）</li>
+                                <li>使用 InputStreamReader/OutputStreamWriter 指定编码</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn show" onclick="startMindmapQuiz()">🎯 学习完成，开始测验</button>
+                    <button class="btn btn-secondary show" onclick="backToStart()">← 返回首页</button>
+                </div>
+            </div>
+
+            <div id="gameScreen" class="hidden">
+                <button class="home-btn" onclick="backToStart()">🏠 返回首页</button>
+                <div class="level-info">
+                    <span class="level-badge" id="levelBadge">第1关：字节流基础</span>
+                    <span id="endlessBadge" class="endless-badge hidden">♾️ 无尽模式</span>
+                </div>
+
+                <div class="question-box">
+                    <div class="question-number" id="questionNumber">问题 1/4</div>
+                    <div class="question-text" id="questionText"></div>
+                    <div class="code-block" id="codeBlock"></div>
+                </div>
+
+                <div class="loading-indicator" id="loadingIndicator">
+                    <div class="spinner"></div>
+                    <span>正在生成题目...</span>
+                </div>
+
+                <div class="options" id="optionsContainer"></div>
+
+                <div class="feedback" id="feedback"></div>
+                <div class="explanation" id="explanation"></div>
+
+                <button class="btn" id="nextBtn" onclick="nextQuestion()">下一题</button>
+                <button class="btn" id="continueBtn" onclick="continueGame()">继续</button>
+            </div>
+
+            <div id="endScreen" class="end-screen hidden">
+                <div class="stream-icon">🎉</div>
+                <h2>挑战结束！</h2>
+                <div class="score-display" id="finalScore">0</div>
+                <div class="rank" id="rank">初级学者</div>
+
+                <div class="result-stats">
+                    <div class="result-stat">
+                        <div class="result-stat-value" id="correctCount">0</div>
+                        <div class="result-stat-label">答对题数</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="result-stat-value" id="totalQuestions">0</div>
+                        <div class="result-stat-label">总题数</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="result-stat-value" id="accuracy">0%</div>
+                        <div class="result-stat-label">正确率</div>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <span class="tip-icon">💡</span>
+                    <span id="tipText">继续学习，深入掌握 Java I/O 的奥秘！</span>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn show" onclick="restartGame()">再玩一次</button>
+                    <button class="btn btn-secondary show" onclick="backToStart()">返回首页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
