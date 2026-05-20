@@ -3,8 +3,8 @@
     <button class="home-btn" @click="goHome">🏠 返回首页</button>
     
     <div class="header">
-      <h1>🗺️ Java I/O 知识导图</h1>
-      <p class="header-desc">系统学习 Java 输入输出流，掌握核心概念与实践技巧</p>
+      <h1>🗺️ Java 全能知识导图</h1>
+      <p class="header-desc">从基础到进阶，系统掌握 Java 开发核心技能</p>
     </div>
 
     <!-- 搜索和过滤 -->
@@ -156,251 +156,377 @@ const tipType = ref('success')
 
 const filterTags = [
   { label: '全部', value: 'all', icon: '📦' },
-  { label: '字节流', value: 'byte', icon: '📥' },
-  { label: '字符流', value: 'char', icon: '📝' },
-  { label: 'NIO', value: 'nio', icon: '🚀' },
-  { label: '实战', value: 'practice', icon: '⚡' }
+  { label: '基础', value: 'basics', icon: '📚' },
+  { label: 'OOP', value: 'oop', icon: '🏠' },
+  { label: '集合', value: 'collections', icon: '📦' },
+  { label: '线程', value: 'thread', icon: '🧵' },
+  { label: 'IO', value: 'io', icon: '💾' },
+  { label: '数据库', value: 'database', icon: '🗄️' },
+  { label: '网络', value: 'network', icon: '🌐' }
 ]
 
 const mindmapData = ref([
   {
-    id: 'byteStream',
-    icon: '📥',
-    title: '字节流体系',
-    description: 'InputStream / OutputStream',
-    concept: '以字节（8位）为单位进行读写，适合处理二进制数据（图片、视频、文件等）。是 Java I/O 的基础。',
-    tags: ['byte'],
+    id: 'javaBasics',
+    icon: '📚',
+    title: 'Java基础语法',
+    description: '数据类型、运算符、流程控制',
+    concept: 'Java语言的基础知识，包括数据类型、变量、运算符、流程控制语句等，是学习Java的第一步。',
+    tags: ['basics'],
     quizLevel: 0,
     subsections: [
       {
-        title: 'InputStream（输入流基类）',
+        title: '数据类型',
         items: [
-          { code: 'FileInputStream', description: '文件输入流，从文件读取字节', note: '最常用的字节输入流' },
-          { code: 'BufferedInputStream', description: '缓冲输入流，提高读取效率', note: '内部缓冲区默认8KB' },
-          { code: 'ObjectInputStream', description: '对象反序列化，读取对象', note: '需要实现 Serializable' },
-          { code: 'DataInputStream', description: '读取基本数据类型', note: 'readInt(), readDouble() 等' }
+          { code: 'int', description: '整数类型，4字节', note: '-2^31 到 2^31-1' },
+          { code: 'double', description: '双精度浮点，8字节', note: 'IEEE 754标准' },
+          { code: 'boolean', description: '布尔类型', note: 'true / false' },
+          { code: 'char', description: '字符类型，2字节', note: 'Unicode编码' }
         ]
       },
       {
-        title: 'OutputStream（输出流基类）',
+        title: '流程控制',
         items: [
-          { code: 'FileOutputStream', description: '文件输出流，写入文件', note: '覆盖模式需谨慎' },
-          { code: 'BufferedOutputStream', description: '缓冲输出流', note: 'flush() 强制刷新' },
-          { code: 'ObjectOutputStream', description: '对象序列化', note: 'transient 字段不序列化' },
-          { code: 'DataOutputStream', description: '写入基本数据类型', note: 'writeInt(), writeUTF()' }
+          { code: 'if-else', description: '条件判断语句' },
+          { code: 'switch', description: '多路分支选择' },
+          { code: 'for / while / do-while', description: '循环语句' },
+          { code: 'break / continue', description: '控制循环流程' }
         ]
       },
       {
-        title: '实战代码',
-        codeTitle: '文件复制示例',
-        code: 'try (BufferedInputStream bis = new BufferedInputStream(\n    new FileInputStream(\"source.txt\"));\n     BufferedOutputStream bos = new BufferedOutputStream(\n    new FileOutputStream(\"dest.txt\"))) {\n    byte[] buffer = new byte[8192];\n    int bytesRead;\n    while ((bytesRead = bis.read(buffer)) != -1) {\n        bos.write(buffer, 0, bytesRead);\n    }\n} catch (IOException e) {\n    e.printStackTrace();\n}',
-        tips: [
-          '使用 try-with-resources 自动关闭资源',
-          '缓冲区大小通常设为 8KB 或 16KB',
-          'read() 返回 -1 表示文件结束'
+        title: '运算符',
+        items: [
+          { code: '== / !=', description: '相等判断' },
+          { code: '&& / ||', description: '逻辑与/或' },
+          { code: '++ / --', description: '自增/自减' },
+          { code: '?:', description: '三元运算符' }
         ]
       }
     ]
   },
   {
-    id: 'charStream',
-    icon: '📝',
-    title: '字符流体系',
-    description: 'Reader / Writer',
-    concept: '以字符（16位Unicode）为单位进行读写，适合处理文本数据，自动处理编码转换，支持中文等多语言。',
-    tags: ['char'],
+    id: 'oopFundamentals',
+    icon: '🏠',
+    title: '面向对象基础',
+    description: '封装、继承、多态、抽象',
+    concept: '面向对象编程是Java的核心思想，通过封装、继承、多态和抽象四大特性实现代码复用和模块化设计。',
+    tags: ['oop'],
     quizLevel: 1,
     subsections: [
       {
-        title: 'Reader（字符输入流）',
+        title: '封装',
         items: [
-          { code: 'FileReader', description: '文件字符输入流', note: '默认使用系统编码' },
-          { code: 'BufferedReader', description: '缓冲字符输入流', note: '提供 readLine() 方法' },
-          { code: 'InputStreamReader', description: '字节流转字符流的桥梁', note: '指定编码很重要' },
-          { code: 'StringReader', description: '从字符串读取', note: '内存中的字符流' }
+          { code: 'private', description: '私有访问修饰符', note: '仅本类可见' },
+          { code: 'public', description: '公共访问修饰符', note: '所有类可见' },
+          { code: 'protected', description: '保护访问修饰符', note: '同包及子类可见' },
+          { code: 'getter/setter', description: '访问器方法', note: '封装属性访问' }
         ]
       },
       {
-        title: 'Writer（字符输出流）',
+        title: '继承',
         items: [
-          { code: 'FileWriter', description: '文件字符输出流', note: '注意编码问题' },
-          { code: 'BufferedWriter', description: '缓冲字符输出流', note: 'newLine() 换行' },
-          { code: 'OutputStreamWriter', description: '字符流转字节流的桥梁', note: '指定输出编码' },
-          { code: 'StringWriter', description: '写入字符串缓冲区', note: '常用于生成字符串' }
+          { code: 'extends', description: '继承关键字', note: '单继承' },
+          { code: 'super', description: '引用父类', note: '调用父类成员' },
+          { code: 'final', description: '最终类/方法', note: '不可继承/重写' },
+          { code: 'Object', description: '所有类的父类', note: '根类' }
         ]
       },
       {
-        title: '实战代码',
-        codeTitle: '读取文本文件',
-        code: 'try (BufferedReader reader = new BufferedReader(\n    new InputStreamReader(\n        new FileInputStream(\"file.txt\"), StandardCharsets.UTF_8))) {\n    String line;\n    while ((line = reader.readLine()) != null) {\n        System.out.println(line);\n    }\n} catch (IOException e) {\n    e.printStackTrace();\n}',
-        tips: [
-          '始终指定字符编码，避免乱码',
-          'StandardCharsets.UTF_8 是最佳实践',
-          'readLine() 返回 null 表示文件结束'
+        title: '多态',
+        items: [
+          { code: 'override', description: '方法重写', note: '子类覆盖父类方法' },
+          { code: 'overload', description: '方法重载', note: '同一类中方法名相同参数不同' },
+          { code: 'abstract', description: '抽象方法', note: '只有声明没有实现' },
+          { code: 'instanceof', description: '类型判断', note: '检查对象类型' }
+        ]
+      },
+      {
+        title: '接口',
+        items: [
+          { code: 'interface', description: '接口定义', note: '抽象方法集合' },
+          { code: 'implements', description: '实现接口', note: '实现所有抽象方法' },
+          { code: 'default', description: '默认方法', note: 'Java 8+ 新增' },
+          { code: 'static', description: '静态方法', note: '接口中的静态方法' }
         ]
       }
     ]
   },
   {
-    id: 'bufferStream',
-    icon: '⚡',
-    title: '缓冲流进阶',
-    description: 'Buffered 系列',
-    concept: '通过缓冲区减少实际 I/O 操作次数，显著提高读写效率。缓冲流是对其他流的包装。',
-    tags: ['practice'],
+    id: 'collectionsFramework',
+    icon: '📦',
+    title: '集合框架',
+    description: 'List、Map、Set、迭代器',
+    concept: 'Java集合框架提供了一套统一的容器类，用于存储和管理对象集合，包括List、Set、Map三大接口及其实现类。',
+    tags: ['collections'],
     quizLevel: 2,
     subsections: [
       {
-        title: '缓冲流工作原理',
+        title: 'List接口',
         items: [
-          { code: '缓冲区', description: '内存中的临时存储区域', note: '默认 8KB' },
-          { code: '批量读写', description: '减少磁盘访问次数', note: '减少系统调用开销' },
-          { code: 'flush()', description: '强制刷新缓冲区', note: 'close() 前自动调用' },
-          { code: 'mark/reset', description: '标记位置并回退', note: '部分流支持' }
+          { code: 'ArrayList', description: '动态数组实现', note: '随机访问快' },
+          { code: 'LinkedList', description: '双向链表实现', note: '插入删除快' },
+          { code: 'Vector', description: '线程安全数组', note: '性能较差' },
+          { code: 'ListIterator', description: '双向迭代器', note: '支持向前遍历' }
         ]
       },
       {
-        title: '缓冲流组合',
+        title: 'Set接口',
         items: [
-          { code: 'BufferedInputStream + FileInputStream', description: '高效读取二进制文件' },
-          { code: 'BufferedOutputStream + FileOutputStream', description: '高效写入二进制文件' },
-          { code: 'BufferedReader + FileReader', description: '高效读取文本文件' },
-          { code: 'BufferedWriter + FileWriter', description: '高效写入文本文件' }
+          { code: 'HashSet', description: '哈希表实现', note: '无序，不重复' },
+          { code: 'TreeSet', description: '红黑树实现', note: '自然排序' },
+          { code: 'LinkedHashSet', description: '保持插入顺序', note: '有序去重' },
+          { code: 'equals/hashCode', description: '判断元素相等', note: '必须同时重写' }
         ]
       },
       {
-        title: '性能对比',
+        title: 'Map接口',
+        items: [
+          { code: 'HashMap', description: '哈希表实现', note: '无序，允许null' },
+          { code: 'TreeMap', description: '红黑树实现', note: '键排序' },
+          { code: 'LinkedHashMap', description: '保持插入顺序', note: '有序Map' },
+          { code: 'ConcurrentHashMap', description: '并发安全', note: '分段锁实现' }
+        ]
+      },
+      {
+        title: '实战代码',
+        codeTitle: '集合操作示例',
+        code: '// ArrayList 使用\nList<String> list = new ArrayList<>();\nlist.add(\"Java\");\nlist.add(\"Python\");\nfor (String item : list) {\n    System.out.println(item);\n}\n\n// HashMap 使用\nMap<String, Integer> map = new HashMap<>();\nmap.put(\"age\", 25);\nmap.get(\"age\"); // 返回 25\n\n// HashSet 去重\nSet<String> set = new HashSet<>(list);\nset.add(\"Java\"); // 重复元素被忽略',
         tips: [
-          '无缓冲：每次 read() 调用系统调用',
-          '有缓冲：先填满缓冲区再批量写入',
-          '性能提升可达 10 倍以上',
-          '大文件操作必备'
+          '优先使用ArrayList而非Vector',
+          'HashMap是非线程安全的',
+          '遍历大集合时使用迭代器'
         ]
       }
     ]
   },
   {
-    id: 'fileOperation',
-    icon: '📁',
-    title: '文件操作',
-    description: 'File / Files',
-    concept: 'Java 提供了丰富的文件操作类，支持文件的创建、读取、写入、删除、复制、移动等操作。',
-    tags: ['practice'],
+    id: 'exceptionHandling',
+    icon: '⚠️',
+    title: '异常处理',
+    description: 'try-catch、自定义异常',
+    concept: '异常处理是Java程序的重要组成部分，通过try-catch-finally语句捕获和处理运行时异常，保证程序的健壮性。',
+    tags: ['basics'],
     quizLevel: 3,
     subsections: [
       {
-        title: 'File 类（传统IO）',
+        title: '异常分类',
         items: [
-          { code: 'exists()', description: '检查文件是否存在' },
-          { code: 'createNewFile()', description: '创建新文件' },
-          { code: 'mkdir() / mkdirs()', description: '创建目录' },
-          { code: 'delete()', description: '删除文件或目录' },
-          { code: 'listFiles()', description: '列出目录内容' },
-          { code: 'renameTo()', description: '重命名文件' }
+          { code: 'Exception', description: '可恢复异常', note: '程序可处理' },
+          { code: 'Error', description: '严重错误', note: '通常不可恢复' },
+          { code: 'Checked', description: '检查异常', note: '必须显式处理' },
+          { code: 'RuntimeException', description: '运行时异常', note: '无需显式处理' }
         ]
       },
       {
-        title: 'Files 类（NIO.2）',
+        title: '异常处理机制',
         items: [
-          { code: 'Files.copy()', description: '复制文件', note: '支持复制选项' },
-          { code: 'Files.move()', description: '移动文件', note: '原子操作' },
-          { code: 'Files.readAllLines()', description: '读取所有行', note: '小文件适用' },
-          { code: 'Files.write()', description: '写入文件', note: '自动创建文件' },
-          { code: 'Files.walk()', description: '遍历目录树', note: '支持深度控制' },
-          { code: 'Files.delete()', description: '删除文件', note: '不存在抛异常' }
+          { code: 'try-catch', description: '捕获异常', note: '处理异常逻辑' },
+          { code: 'finally', description: '最终执行', note: '无论是否异常都执行' },
+          { code: 'throw', description: '抛出异常', note: '手动抛出' },
+          { code: 'throws', description: '声明异常', note: '向上层抛出' }
         ]
       },
       {
         title: '实战代码',
-        codeTitle: 'NIO.2 文件操作',
-        code: '// 读取文件\nList<String> lines = Files.readAllLines(\n    Paths.get(\"data.txt\"), StandardCharsets.UTF_8);\n\n// 写入文件\nFiles.write(Paths.get(\"output.txt\"),\n    content.getBytes(StandardCharsets.UTF_8));\n\n// 复制文件\nFiles.copy(sourcePath, targetPath,\n    StandardCopyOption.REPLACE_EXISTING);\n\n// 遍历目录\nFiles.walk(Paths.get(\".\"))\n    .filter(Files::isRegularFile)\n    .forEach(System.out::println);',
+        codeTitle: '异常处理示例',
+        code: 'try {\n    // 可能抛出异常的代码\n    FileInputStream fis = new FileInputStream(\"test.txt\");\n    int data = fis.read();\n} catch (FileNotFoundException e) {\n    // 处理文件不存在异常\n    System.err.println(\"文件未找到\");\n} catch (IOException e) {\n    // 处理IO异常\n    e.printStackTrace();\n} finally {\n    // 资源清理\n    System.out.println(\"操作完成\");\n}',
         tips: [
-          'NIO.2 API 更简洁易用',
-          'Path 替代传统 File',
-          '支持批量操作'
+          '优先捕获具体异常而非Exception',
+          'finally块适合资源清理',
+          '不要忽略异常'
         ]
       }
     ]
   },
   {
-    id: 'nio',
-    icon: '🚀',
-    title: 'NIO 新世界',
-    description: 'Channel / Buffer / Selector',
-    concept: 'Java NIO（New I/O）提供了非阻塞 I/O 操作，适合高并发场景。核心组件包括 Channel、Buffer 和 Selector。',
-    tags: ['nio'],
+    id: 'multithreading',
+    icon: '🧵',
+    title: '多线程编程',
+    description: 'Thread、Runnable、并发',
+    concept: '多线程编程允许程序同时执行多个任务，提高CPU利用率和程序响应性，是高并发应用的基础。',
+    tags: ['thread'],
     quizLevel: 4,
     subsections: [
       {
-        title: '三大核心组件',
+        title: '线程创建',
         items: [
-          { code: 'Channel', description: '双向数据传输通道', note: '可同时读写' },
-          { code: 'Buffer', description: '数据容器', note: '多种数据类型支持' },
-          { code: 'Selector', description: '多路复用器', note: '单线程管理多通道' }
+          { code: 'extends Thread', description: '继承Thread类', note: '单继承限制' },
+          { code: 'implements Runnable', description: '实现Runnable接口', note: '推荐方式' },
+          { code: 'implements Callable', description: '实现Callable接口', note: '可返回结果' },
+          { code: 'ExecutorService', description: '线程池', note: '管理线程生命周期' }
         ]
       },
       {
-        title: 'Buffer 核心方法',
+        title: '线程同步',
         items: [
-          { code: 'flip()', description: '切换到读模式', note: 'limit=position, position=0' },
-          { code: 'clear()', description: '清空缓冲区', note: 'position=0, limit=capacity' },
-          { code: 'rewind()', description: '重置位置', note: 'position=0, limit不变' },
-          { code: 'remaining()', description: '剩余元素数量', note: 'limit - position' },
-          { code: 'compact()', description: '压缩缓冲区', note: '未读数据移到开头' },
-          { code: 'mark() / reset()', description: '标记与重置', note: '保存/恢复位置' }
+          { code: 'synchronized', description: '同步关键字', note: '保证原子性' },
+          { code: 'volatile', description: '可见性保证', note: '禁止指令重排序' },
+          { code: 'Lock', description: '显式锁', note: '更灵活的锁机制' },
+          { code: 'Atomic', description: '原子操作类', note: '无锁并发' }
+        ]
+      },
+      {
+        title: '并发工具',
+        items: [
+          { code: 'CountDownLatch', description: '计数器', note: '等待多个任务完成' },
+          { code: 'CyclicBarrier', description: '循环栅栏', note: '等待所有线程到达' },
+          { code: 'Semaphore', description: '信号量', note: '控制并发数量' },
+          { code: 'Future', description: '异步结果', note: '获取异步任务结果' }
         ]
       },
       {
         title: '实战代码',
-        codeTitle: 'NIO 文件复制',
-        code: 'try (FileChannel inChannel = new FileInputStream(\n        \"source.txt\").getChannel();\n     FileChannel outChannel = new FileOutputStream(\n        \"dest.txt\").getChannel()) {\n    \n    ByteBuffer buffer = ByteBuffer.allocate(8192);\n    while (inChannel.read(buffer) != -1) {\n        buffer.flip();  // 切换到读模式\n        outChannel.write(buffer);\n        buffer.compact(); // 压缩未读数据\n    }\n} catch (IOException e) {\n    e.printStackTrace();\n}',
+        codeTitle: '线程创建与同步',
+        code: '// 创建线程方式1：实现Runnable\nThread thread = new Thread(() -> {\n    System.out.println(\"线程执行中\");\n});\nthread.start();\n\n// 线程同步\nsynchronized void increment() {\n    count++;\n}\n\n// 使用线程池\nExecutorService executor = Executors.newFixedThreadPool(4);\nexecutor.submit(() -> doWork());\nexecutor.shutdown();',
         tips: [
-          'Channel 必须配合 Buffer 使用',
-          'flip() 和 compact() 是关键操作',
-          'NIO 适合大文件操作'
+          '优先使用线程池而非手动创建线程',
+          '避免死锁：按序获取锁',
+          'volatile不能保证原子性'
         ]
       }
     ]
   },
   {
-    id: 'resourceManagement',
-    icon: '🔒',
-    title: '资源管理',
-    description: 'try-with-resources / Serialization',
-    concept: '正确管理 I/O 资源，避免资源泄漏。Java 7+ 提供 try-with-resources 自动资源管理。',
-    tags: ['practice'],
+    id: 'javaIo',
+    icon: '💾',
+    title: 'Java I/O',
+    description: '字节流、字符流、NIO',
+    concept: 'Java I/O提供了丰富的输入输出操作，包括传统的字节流/字符流和NIO的Channel/Buffer/Selector。',
+    tags: ['io'],
     quizLevel: 5,
     subsections: [
       {
-        title: 'try-with-resources',
-        codeTitle: '自动资源管理',
-        code: '// Java 7+ 自动关闭资源\ntry (FileInputStream fis = new FileInputStream(\"test.txt\");\n     BufferedInputStream bis = new BufferedInputStream(fis)) {\n    // 使用资源\n    int data = bis.read();\n} catch (IOException e) {\n    // 异常处理\n    e.printStackTrace();\n}\n\n// 资源按声明逆序关闭',
-        tips: [
-          '实现 AutoCloseable 接口即可自动关闭',
-          '资源按声明的逆序关闭',
-          '异常会被抑制（suppressed exceptions）',
-          '推荐所有资源使用此模式'
+        title: '字节流',
+        items: [
+          { code: 'InputStream', description: '字节输入流基类', note: '抽象类' },
+          { code: 'OutputStream', description: '字节输出流基类', note: '抽象类' },
+          { code: 'FileInputStream', description: '文件字节输入流', note: '读取二进制文件' },
+          { code: 'BufferedInputStream', description: '缓冲字节输入流', note: '提高效率' }
         ]
       },
       {
-        title: '序列化',
+        title: '字符流',
         items: [
-          { code: 'Serializable', description: '标记接口', note: '无需实现方法' },
-          { code: 'ObjectOutputStream', description: '序列化对象', note: 'writeObject()' },
-          { code: 'ObjectInputStream', description: '反序列化对象', note: 'readObject()' },
-          { code: 'transient', description: '不序列化字段', note: '临时数据' },
-          { code: 'serialVersionUID', description: '版本UID', note: '兼容性控制' }
+          { code: 'Reader', description: '字符输入流基类', note: '处理文本' },
+          { code: 'Writer', description: '字符输出流基类', note: '处理文本' },
+          { code: 'BufferedReader', description: '缓冲字符输入流', note: 'readLine()' },
+          { code: 'InputStreamReader', description: '字节流转字符流', note: '指定编码' }
+        ]
+      },
+      {
+        title: 'NIO',
+        items: [
+          { code: 'Channel', description: '双向通道', note: '比Stream更高效' },
+          { code: 'Buffer', description: '数据缓冲区', note: 'flip()切换读写' },
+          { code: 'Selector', description: '多路复用器', note: '单线程管理多连接' },
+          { code: 'Path/Files', description: 'NIO.2文件API', note: '简化文件操作' }
         ]
       },
       {
         title: '实战代码',
-        codeTitle: '对象序列化',
-        code: '// 序列化对象\ntry (ObjectOutputStream oos = new ObjectOutputStream(\n        new FileOutputStream(\"data.ser\"))) {\n    User user = new User(\"Alice\", 25);\n    oos.writeObject(user);\n}\n\n// 反序列化\ntry (ObjectInputStream ois = new ObjectInputStream(\n        new FileInputStream(\"data.ser\"))) {\n    User user = (User) ois.readObject();\n}\n\n// User 类必须实现 Serializable\nclass User implements Serializable {\n    private static final long serialVersionUID = 1L;\n    private String name;\n    private int age;\n    // ...\n}',
+        codeTitle: '文件读写示例',
+        code: '// 使用 try-with-resources 读取文件\ntry (BufferedReader reader = new BufferedReader(\n    new FileReader(\"data.txt\"))) {\n    String line;\n    while ((line = reader.readLine()) != null) {\n        System.out.println(line);\n    }\n}\n\n// NIO 文件复制\ntry (FileChannel in = new FileInputStream(\"src.txt\").getChannel();\n     FileChannel out = new FileOutputStream(\"dst.txt\").getChannel()) {\n    ByteBuffer buf = ByteBuffer.allocate(8192);\n    while (in.read(buf) != -1) {\n        buf.flip();\n        out.write(buf);\n        buf.clear();\n    }\n}',
         tips: [
-          '静态字段不会被序列化',
-          'transient 字段不会被序列化',
-          '序列化版本号确保兼容性',
-          '谨慎序列化敏感数据'
+          '始终使用try-with-resources',
+          '处理大文件使用NIO',
+          '注意字符编码问题'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'database',
+    icon: '🗄️',
+    title: '数据库编程',
+    description: 'JDBC、SQL、连接池',
+    concept: 'Java通过JDBC接口访问数据库，执行SQL语句，实现数据的增删改查操作，是企业级应用的核心技能。',
+    tags: ['database'],
+    quizLevel: 6,
+    subsections: [
+      {
+        title: 'JDBC基础',
+        items: [
+          { code: 'DriverManager', description: '驱动管理', note: '加载驱动建立连接' },
+          { code: 'Connection', description: '数据库连接', note: '会话对象' },
+          { code: 'Statement', description: 'SQL语句对象', note: '执行静态SQL' },
+          { code: 'PreparedStatement', description: '预编译语句', note: '防止SQL注入' },
+          { code: 'ResultSet', description: '结果集', note: '存储查询结果' }
+        ]
+      },
+      {
+        title: '连接池',
+        items: [
+          { code: 'HikariCP', description: '高性能连接池', note: 'Spring Boot默认' },
+          { code: 'Druid', description: '阿里连接池', note: '监控功能强大' },
+          { code: 'C3P0', description: '传统连接池', note: '稳定性好' },
+          { code: 'DataSource', description: '数据源接口', note: '连接池标准' }
+        ]
+      },
+      {
+        title: '事务管理',
+        items: [
+          { code: 'setAutoCommit(false)', description: '关闭自动提交', note: '手动控制事务' },
+          { code: 'commit()', description: '提交事务', note: '成功时调用' },
+          { code: 'rollback()', description: '回滚事务', note: '失败时调用' },
+          { code: 'Savepoint', description: '保存点', note: '部分回滚' }
+        ]
+      },
+      {
+        title: '实战代码',
+        codeTitle: 'JDBC查询示例',
+        code: 'try (Connection conn = DriverManager.getConnection(\n    \"jdbc:mysql://localhost:3306/mydb\", \"user\", \"pass\");\n     PreparedStatement stmt = conn.prepareStatement(\n        \"SELECT * FROM users WHERE id = ?\")) {\n    \n    stmt.setInt(1, 1); // 设置参数\n    ResultSet rs = stmt.executeQuery();\n    \n    while (rs.next()) {\n        String name = rs.getString(\"name\");\n        int age = rs.getInt(\"age\");\n    }\n}\n// 使用 try-with-resources 自动关闭资源',
+        tips: [
+          '使用PreparedStatement防止SQL注入',
+          '连接池必须配置合理',
+          '事务边界要明确'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'networkProgramming',
+    icon: '🌐',
+    title: '网络编程',
+    description: 'Socket、HTTP、TCP/IP',
+    concept: 'Java网络编程实现不同主机间的通信，包括Socket编程、HTTP通信等，是分布式系统的基础。',
+    tags: ['network'],
+    quizLevel: 7,
+    subsections: [
+      {
+        title: 'Socket编程',
+        items: [
+          { code: 'ServerSocket', description: '服务器端套接字', note: '监听端口' },
+          { code: 'Socket', description: '客户端套接字', note: '建立连接' },
+          { code: 'InetAddress', description: 'IP地址封装', note: '表示网络地址' },
+          { code: 'SocketTimeoutException', description: '超时异常', note: '连接超时' }
+        ]
+      },
+      {
+        title: 'HTTP通信',
+        items: [
+          { code: 'HttpURLConnection', description: 'HTTP连接', note: 'JDK内置' },
+          { code: 'OkHttp', description: 'HTTP客户端', note: '高性能' },
+          { code: 'HttpClient', description: 'Java 11+ HTTP客户端', note: '新API' },
+          { code: 'RestTemplate', description: 'Spring HTTP客户端', note: '简化REST调用' }
+        ]
+      },
+      {
+        title: 'TCP/UDP',
+        items: [
+          { code: 'TCP', description: '传输控制协议', note: '可靠、有序' },
+          { code: 'UDP', description: '用户数据报协议', note: '不可靠、快速' },
+          { code: 'DatagramSocket', description: 'UDP套接字', note: '发送数据报' },
+          { code: 'DatagramPacket', description: '数据报包', note: 'UDP数据单元' }
+        ]
+      },
+      {
+        title: '实战代码',
+        codeTitle: 'Socket服务端示例',
+        code: '// 服务端\nServerSocket server = new ServerSocket(8888);\nwhile (true) {\n    Socket client = server.accept();\n    // 处理客户端连接\n    new Thread(() -> handleClient(client)).start();\n}\n\n// HTTP GET 请求\nHttpClient client = HttpClient.newHttpClient();\nHttpRequest request = HttpRequest.newBuilder()\n    .uri(URI.create(\"https://api.example.com/data\"))\n    .GET()\n    .build();\nHttpResponse<String> response = client.send(request,\n    HttpResponse.BodyHandlers.ofString());',
+        tips: [
+          '服务端需要处理并发连接',
+          'HTTP客户端优先使用OkHttp',
+          'UDP适合实时性要求高的场景'
         ]
       }
     ]
@@ -549,8 +675,8 @@ function goHome() {
   top: 15px;
   right: 15px;
   background: rgba(255, 255, 255, 0.95);
-  color: #0066cc;
-  border: 2px solid #0066cc;
+  color: #667eea;
+  border: 2px solid #667eea;
   padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
@@ -560,12 +686,12 @@ function goHome() {
 }
 
 .home-btn:hover {
-  background: #0066cc;
+  background: #667eea;
   color: white;
 }
 
 .header {
-  background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 30px;
   text-align: center;
@@ -599,7 +725,7 @@ function goHome() {
 }
 
 .search-input-wrapper:focus-within {
-  border-color: #0066cc;
+  border-color: #667eea;
 }
 
 .search-icon {
@@ -641,7 +767,7 @@ function goHome() {
 
 .filter-tag {
   background: white;
-  border: 1px solid #cce0ff;
+  border: 1px solid #ddd;
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 0.85em;
@@ -650,14 +776,14 @@ function goHome() {
 }
 
 .filter-tag:hover {
-  border-color: #0066cc;
-  color: #0066cc;
+  border-color: #667eea;
+  color: #667eea;
 }
 
 .filter-tag.active {
-  background: #0066cc;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  border-color: #0066cc;
+  border-color: #667eea;
 }
 
 .progress-bar {
@@ -707,29 +833,29 @@ function goHome() {
 
 .mindmap-section {
   margin-bottom: 18px;
-  border: 1px solid #cce0ff;
+  border: 1px solid #e2e8f0;
   border-radius: 15px;
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
 .mindmap-section.completed {
-  border-color: #00cc66;
-  background: #f8fff9;
+  border-color: #10b981;
+  background: #f0fdf4;
 }
 
 .mindmap-header {
   display: flex;
   align-items: center;
   padding: 18px 22px;
-  background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .mindmap-header:hover {
-  background: linear-gradient(135deg, #0055bb 0%, #003388 100%);
+  background: linear-gradient(135deg, #5a6fd6 0%, #6b4190 100%);
 }
 
 .section-number {
@@ -787,7 +913,7 @@ function goHome() {
 
 .concept-card {
   display: flex;
-  background: linear-gradient(135deg, #e6f0ff 0%, #d4e4ff 100%);
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
   border-radius: 12px;
   padding: 18px;
   margin-bottom: 20px;
@@ -799,7 +925,7 @@ function goHome() {
 }
 
 .concept-content h4 {
-  color: #0066cc;
+  color: #6d28d9;
   margin-bottom: 8px;
   font-size: 1.05em;
 }
@@ -828,7 +954,7 @@ function goHome() {
 
 .subsection-header h4 {
   margin: 0;
-  color: #0066cc;
+  color: #667eea;
   font-size: 1em;
 }
 
@@ -861,12 +987,12 @@ function goHome() {
 }
 
 .item-code {
-  background: #e6f0ff;
+  background: #f3f4f6;
   padding: 4px 10px;
   border-radius: 6px;
   font-family: 'Consolas', monospace;
   font-size: 0.9em;
-  color: #004499;
+  color: #667eea;
   margin-right: 10px;
   white-space: nowrap;
 }
@@ -968,7 +1094,7 @@ function goHome() {
 
 .action-btn {
   flex: 1;
-  background: linear-gradient(135deg, #00cc66 0%, #00aa55 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border: none;
   padding: 12px 20px;
@@ -980,11 +1106,11 @@ function goHome() {
 
 .action-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 204, 102, 0.4);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 
 .action-btn-secondary {
-  background: linear-gradient(135deg, #4a90d9 0%, #3a7bc8 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .action-buttons {
@@ -993,11 +1119,11 @@ function goHome() {
   justify-content: center;
   padding: 25px;
   background: #f8fafc;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #e2e8f0;
 }
 
 .btn {
-  background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   padding: 13px 35px;
@@ -1009,15 +1135,15 @@ function goHome() {
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(0, 102, 204, 0.4);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #4a90d9 0%, #3a7bc8 100%);
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #00cc66 0%, #00aa55 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
 .float-tip {
